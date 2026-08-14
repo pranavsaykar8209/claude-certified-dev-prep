@@ -1,0 +1,777 @@
+[
+  {
+    "number": 1,
+    "question": "A contract-analysis prompt contains policy instructions, a contract excerpt, and notes from an external reviewer in one unmarked text block. Claude sometimes follows instructions embedded inside the reviewer notes. Which TWO prompt changes should the team make?",
+    "options": [
+      "Wrap the contract and reviewer notes in distinct XML sections, then tell Claude which section may supply facts and which fields the answer must return.",
+      "Place the authoritative analysis rules in the system instructions and state that contract text and reviewer notes are untrusted data, not commands.",
+      "Remove the system instructions and repeat the policy rules after every contract paragraph so the model sees them near the relevant evidence.",
+      "Move the reviewer notes to the end of the prompt because Claude always gives the least authority to the final text it reads.",
+      "Increase temperature so Claude is less likely to copy the exact wording of an instruction found inside the reviewer notes."
+    ],
+    "correctAnswers": [
+      "Place the authoritative analysis rules in the system instructions and state that contract text and reviewer notes are untrusted data, not commands.",
+      "Wrap the contract and reviewer notes in distinct XML sections, then tell Claude which section may supply facts and which fields the answer must return."
+    ],
+    "explanation": "Instruction authority should be clear before the model sees external content. This option defines which text controls behavior and which text is only evidence to analyze. This directly supports the need to keep authoritative instructions separate from untrusted contract and reviewer content. The design uses system-level rules plus explicit XML boundaries for source sections. The prompt labels trusted and untrusted roles and defines a concise output contract. External notes can provide facts but cannot change the task or authorize actions. The release check should include prompt-injection test notes, conflicting instruction cases, and schema checks for the final analysis. Those cases can expose external reviewer content overriding policy or changing the requested output. Clean results show that the system can keep authoritative instructions separate from untrusted contract and reviewer content. Clear delimiters make the boundaries between instructions and source material easier to follow. The output requirement also reduces ambiguity about how the analysis should be presented. The choice works because the application has to keep authoritative instructions separate from untrusted contract and reviewer content. The prompt labels trusted and untrusted roles and defines a concise output contract. External notes can provide facts but cannot change the task or authorize actions. Claude can use external evidence without treating it as a new instruction source. Confidence should come from prompt-injection test notes, conflicting instruction cases, and schema checks for the final analysis. The checks must detect external reviewer content overriding policy or changing the requested output. The evidence should show that the service can keep authoritative instructions separate from untrusted contract and reviewer content."
+  },
+  {
+    "number": 2,
+    "question": "Claude returns the following assistant content in one turn: [{\"type\":\"tool_use\",\"id\":\"toolu_1\",\"name\":\"lookup_order\",\"input\":{\"id\":\"A1\"}},{\"type\":\"tool_use\",\"id\":\"toolu_2\",\"name\":\"lookup_customer\",\"input\":{\"id\":\"C7\"}}] The application executes both client tools and wants to add a short status note. The follow-up must preserve the tool-use identifiers and the required message ordering. Which message structure should it send next?",
+    "options": [
+      "Add both tool_result blocks to an assistant message and place the status note in the next user message.",
+      "Send one user message whose content begins with both matching tool_result blocks, followed by the optional status text after those results.",
+      "Send a single text block that summarizes both tool outputs because Claude can infer which result belongs to each tool call.",
+      "Send one user message for the first tool result, a second user message for the status text, and a third for the remaining result."
+    ],
+    "correctAnswers": [
+      "Send one user message whose content begins with both matching tool_result blocks, followed by the optional status text after those results."
+    ],
+    "explanation": "Every tool call needs a result linked by its tool-use identifier. Placing all results first in one user message preserves the documented parallel tool-use history. The proposed choice allows the service to return several client tool results with correct identifiers and ordering. The handler collects results, preserves each tool_use_id, and emits a single ordered content array. Status text may follow the results but cannot separate or replace them. Claude receives a complete and unambiguous record of the parallel tool executions. The test plan should contain schema tests for block order, identifier matching, and two simultaneous tool calls. Each case should be examined for unmatched results, reduced parallel behavior, or an invalid Messages request. The plan passes when the system can return several client tool results with correct identifiers and ordering."
+  },
+  {
+    "number": 3,
+    "question": "A browser application opens several independent work tabs for one signed-in analyst. The current backend sends every tab through one conversation history, so evidence from one investigation appears in another. What should the developer change? Clear the shared history whenever any tab submits a request so the newest investigation always starts from a clean conversation. Keep one conversation per user and add the tab title to each message so Claude can decide which earlier turns belong to the active task.",
+    "options": [
+      "Clear the shared history whenever any tab submits a request so the newest investigation always starts from a clean conversation.",
+      "Keep one conversation per user and add the tab title to each message so Claude can decide which earlier turns belong to the active task.",
+      "Create a separate server-side conversation state for each work tab and bind every request to both the authenticated user and the tab identifier within service limits.",
+      "Store all tab histories in one system prompt and ask Claude to reference only the section whose name matches the current browser tab."
+    ],
+    "correctAnswers": [
+      "Create a separate server-side conversation state for each work tab and bind every request to both the authenticated user and the tab identifier within service limits."
+    ],
+    "explanation": "The same user can conduct several unrelated tasks that need different histories. A tab-scoped state prevents evidence and instructions from crossing between those investigations. For this case, the design must isolate unrelated investigations that belong to the same authenticated user. The design uses tab-scoped conversation identifiers and server-side state. The backend authorizes the user, loads only the selected tab history, and appends the new turn to that record. A user identity does not imply that every concurrent task shares context. Useful evidence comes from two-tab contamination tests, tab-close behavior, and authorization checks for guessed tab identifiers. The team should watch for evidence leakage between tasks or accidental deletion of another active investigation. The evidence is complete only when the application can isolate unrelated investigations that belong to the same authenticated user."
+  },
+  {
+    "number": 4,
+    "question": "A support classifier must map rare customer phrases to eight internal labels whose names are not intuitive. Zero-shot instructions perform well for common labels but confuse three rare categories. Which prompting change is most likely to help first?",
+    "options": [
+      "Add a small set of representative examples for the confused categories, showing the exact label mapping and the distinctions between similar cases.",
+      "Remove the label definitions and ask Claude to select the category that feels most semantically similar to each customer phrase.",
+      "Randomize the order of labels on every request so the model does not overfit to a fixed position when choosing a category deliberately.",
+      "Increase the output token limit so Claude has more space to reason before returning one of the eight short label names."
+    ],
+    "correctAnswers": [
+      "Add a small set of representative examples for the confused categories, showing the exact label mapping and the distinctions between similar cases."
+    ],
+    "explanation": "The model needs concrete demonstrations of an unfamiliar classification convention. Targeted examples clarify how rare phrases map to labels that cannot be inferred reliably from their names. That approach lets the system teach Claude an uncommon label mapping for rare but important cases. Examples supplement rather than replace representative evaluations. The best fit here is focused few-shot examples that demonstrate the desired distinctions. Claude receives the specific task convention that zero-shot instructions did not convey. Before deployment, run a holdout set of rare phrases, confusion-matrix comparison, and checks for degraded common-label performance. These checks are designed to reveal persistent misclassification of the categories that matter most operationally. They also confirm that the service can teach Claude an uncommon label mapping for rare but important cases."
+  },
+  {
+    "number": 5,
+    "question": "A refund tool uses strict schema validation and receives well-formed arguments, but a user attempts to refund an order owned by another account. The developer claims strict tool use already makes the operation safe. What additional control is required? Return the tool call to Claude for a second opinion and execute it only when the model repeats the same arguments twice precisely. Add more field descriptions to the schema so Claude understands that it should never request a refund for another user's order.",
+    "options": [
+      "Return the tool call to Claude for a second opinion and execute it only when the model repeats the same arguments twice precisely.",
+      "Add more field descriptions to the schema so Claude understands that it should never request a refund for another user's order.",
+      "Validate the authenticated user's authorization and refund eligibility in application code before executing the tool, even when the arguments match the schema.",
+      "Increase the strictness of the JSON schema until it includes every possible business rule as a pattern or numeric constraint."
+    ],
+    "correctAnswers": [
+      "Validate the authenticated user's authorization and refund eligibility in application code before executing the tool, even when the arguments match the schema."
+    ],
+    "explanation": "Schema validation confirms shape and types, not whether the caller may perform the business action. The executor must apply account ownership and refund rules using trusted application state. This is important because the team must prevent a well-formed tool call from performing an unauthorized refund. Model output and schema validity never grant business authority. Strict schemas improve reliability while application controls enforce who may act. The executor derives user identity from the trusted session and checks the order before invoking the payment system. The design can be exercised through cross-account refund tests, expired eligibility tests, and valid same-account refund cases. These tests reveal signs of financial loss or data exposure through a valid but unauthorized tool call. They provide clear evidence that the application can prevent a well-formed tool call from performing an unauthorized refund."
+  },
+  {
+    "number": 6,
+    "question": "A service caches stable tool definitions and a system prompt, but changes tool_choice for different stages of one conversation. The team sees fewer cache hits than expected and wants to preserve the reusable prefix. Which change best addresses the cache behavior?",
+    "options": [
+      "Move tool_choice into the cached system prompt because parameters written as instructions cannot invalidate any part of the API cache.",
+      "Disable prompt caching for tool definitions and cache only the latest user message because dynamic content receives the highest reuse rate.",
+      "Place cache breakpoints before the stage-specific variation and keep stable tools and system content identical so only the later message cache is invalidated.",
+      "Add a separate cache breakpoint after every tool definition because more breakpoints guarantee that no later parameter can affect earlier cached content."
+    ],
+    "correctAnswers": [
+      "Place cache breakpoints before the stage-specific variation and keep stable tools and system content identical so only the later message cache is invalidated."
+    ],
+    "explanation": "Prompt caching follows a prefix hierarchy, and some request changes invalidate only the later portion. A stable early prefix can remain reusable even when stage-specific tool choice changes afterward. This gives the application a practical way to reuse stable tools and instructions while allowing later stage-specific request changes. The service keeps tools and system content byte-stable and places dynamic choices after the reusable boundary. A changed tool definition still invalidates the earlier cache and must not be hidden. The service preserves meaningful prefix reuse without freezing legitimate stage behavior. Before deployment, run cache-read token metrics across stages, deliberate parameter changes, and definition-change tests. These checks are designed to reveal unexpected cache misses, higher cost, or stale assumptions about what the cache contains. They also confirm that the service can reuse stable tools and instructions while allowing later stage-specific request changes."
+  },
+  {
+    "number": 7,
+    "question": "A Python service streams Claude output into a queue consumed by a slow browser connection. The producer keeps reading events without limit, and memory usage grows during long responses. Which change addresses the underlying engineering problem?",
+    "options": [
+      "Use a bounded asynchronous queue and pause reading or cancel the stream when the consumer cannot keep pace within the allowed buffer.",
+      "Convert every event to a shorter string before enqueueing it because smaller objects will keep the queue manageable for most users.",
+      "Read the complete response into memory first, then send it to the browser as one message after the model finishes.",
+      "Increase the process memory limit so the service can retain more events while the browser catches up during unusually long responses."
+    ],
+    "correctAnswers": [
+      "Use a bounded asynchronous queue and pause reading or cancel the stream when the consumer cannot keep pace within the allowed buffer."
+    ],
+    "explanation": "The service needs backpressure between the network stream and the slower downstream consumer. A bounded queue prevents an unbounded collection of events from consuming process memory. This is how the team can control memory when a streaming producer is faster than its consumer. The stream reader awaits queue capacity and closes the upstream request when the client exceeds the service policy. The required control comes from bounded buffering with backpressure and cancellation rules. Streaming remains responsive without sacrificing resource limits. Before deployment, run slow-consumer load tests, cancellation tests, and memory measurements during maximum-length streams. These checks are designed to reveal process exhaustion, stalled connections, or a service-wide outage caused by one slow client. They also confirm that the service can control memory when a streaming producer is faster than its consumer."
+  },
+  {
+    "number": 8,
+    "question": "A TypeScript service manually concatenates streamed text: let text = \"\"; for await (const event of stream) { if (event.type === \"text_delta\") text += event.delta.text; } The browser needs incremental text, and logging needs the complete Message with metadata. The implementation should avoid reconstructing response metadata by hand. Which implementation is preferable? Open a WebSocket to the Messages endpoint and wait for a final JSON frame because WebSockets guarantee complete message aggregation. Make one streaming request for the browser and a second nonstreaming request solely to obtain a complete object for the log.",
+    "options": [
+      "The browser needs incremental text, and logging needs the complete Message with metadata. The implementation should avoid reconstructing response metadata by hand. Which implementation is preferable?",
+      "Open a WebSocket to the Messages endpoint and wait for a final JSON frame because WebSockets guarantee complete message aggregation.",
+      "Make one streaming request for the browser and a second nonstreaming request solely to obtain a complete object for the log.",
+      "Use the SDK streaming helper to consume text events and call its final-message aggregation method after the stream completes.",
+      "Store only the concatenated text deltas because logging tool calls, stop reasons, and usage metadata is unnecessary after the user sees the answer."
+    ],
+    "correctAnswers": [
+      "Use the SDK streaming helper to consume text events and call its final-message aggregation method after the stream completes."
+    ],
+    "explanation": "The SDK already provides a supported way to combine streamed events into the same Message shape returned by a nonstreaming call. This reduces custom state logic while preserving incremental display. It is a direct match for the requirement to stream user-visible text and retain the complete response object from the same model call. Logging uses the same request rather than a second generation or a text-only reconstruction. The service gains both low-latency display and a faithful durable response record. The handler forwards text deltas and retrieves the aggregated Message when the stream closes normally. Use responses containing text, tools, usage, and stop reasons compared with the aggregated object to check the completed behavior. These cases should surface missing metadata, inconsistent duplicate calls, or incorrect manual event assembly. Passing them demonstrates that the workflow can stream user-visible text and retain the complete response object from the same model call."
+  },
+  {
+    "number": 9,
+    "question": "A repair agent repeatedly includes complete tool outputs from earlier inspections, even after the relevant component has been fixed. The history now contains thousands of lines of obsolete logs, but exact part numbers and open work orders must remain available. What should the developer do? Clear the conversation after every repair step and ask the technician to reenter any details needed for the next action.",
+    "options": [
+      "Clear the conversation after every repair step and ask the technician to reenter any details needed for the next action.",
+      "Prune resolved tool outputs, keep exact active identifiers in structured application state, and compact the remaining conversation around unresolved repair decisions.",
+      "Compact the entire history into one natural-language summary and delete all structured state because Claude can reconstruct identifiers from the repair narrative.",
+      "Keep every tool result and switch to a larger context model because complete raw history always produces more accurate repair decisions."
+    ],
+    "correctAnswers": [
+      "Prune resolved tool outputs, keep exact active identifiers in structured application state, and compact the remaining conversation around unresolved repair decisions."
+    ],
+    "explanation": "The obsolete logs no longer contribute to the current task and should not consume context. Exact identifiers belong in durable structured state because a summary could alter or omit them. This meets the stated requirement to remove obsolete tool data while preserving exact active repair state. The agent retains the facts that must remain exact and discards evidence that has served its purpose. The application marks resolved evidence, stores identifiers outside the summary, and rebuilds a concise working context. Summarization does not become the authoritative source for exact operational identifiers. Operational testing should use long-session tests, identifier integrity checks, and repair continuation after compaction. That testing makes context bloat, wrong-part actions, or repeated technician data entry visible. It also proves whether the implementation can remove obsolete tool data while preserving exact active repair state."
+  },
+  {
+    "number": 10,
+    "question": "An operations agent can access more than two thousand internal tools. Sending every definition on each turn increases input cost and makes tool selection less reliable. Which design is most appropriate? Put the complete catalog in a user message rather than the tools array so it will not count toward tool-related context or caching limits during rollout.",
+    "options": [
+      "Put the complete catalog in a user message rather than the tools array so it will not count toward tool-related context or caching limits during rollout.",
+      "Use tool search or deferred loading so Claude discovers a small relevant subset at runtime instead of receiving the entire tool catalog in every request.",
+      "Rename every tool to a shorter identifier and continue sending all definitions because name length is the primary cause of selection errors.",
+      "Allow Claude to call an unrestricted generic execute_tool function with arbitrary tool names and free-form JSON arguments."
+    ],
+    "correctAnswers": [
+      "Use tool search or deferred loading so Claude discovers a small relevant subset at runtime instead of receiving the entire tool catalog in every request."
+    ],
+    "explanation": "The problem is the size and ambiguity of the available tool definitions. On-demand discovery reduces the prompt prefix while keeping the full catalog reachable when needed. This directly supports the need to make a very large tool catalog available without loading every definition into each turn. The agent can scale to a large catalog while seeing only the tools relevant to the current task. The application indexes tool metadata, returns relevant definitions, and validates calls against the selected schemas. Undiscovered tools cannot be called through an unrestricted generic executor. Confidence should come from tool-selection evals, prompt-token measurements, and authorization tests for tools outside the loaded subset. The checks must detect high context cost, confused selection, or unsafe generic execution. The team should also verify that the service can make a very large tool catalog available without loading every definition into each turn."
+  },
+  {
+    "number": 11,
+    "question": "A software agent reads issue descriptions from an external tracker through MCP and can also merge pull requests. An issue may contain hidden instructions that ask the agent to bypass review and merge a malicious change. Which TWO controls are most important?",
+    "options": [
+      "Require application-enforced review approval before the merge tool can run, and scope the agent's repository permissions to the minimum required actions.",
+      "Allow automatic merges only when the issue contains a recognized project label, since labels prove that the issue text was reviewed by a maintainer.",
+      "Use a larger model because stronger instruction following makes Claude less likely to obey malicious text found in an issue.",
+      "Treat issue content as untrusted data, keep repository policy in trusted instructions, and prevent retrieved text from changing the agent's operating rules.",
+      "Tell contributors not to place instructions in issue descriptions and assume the tracker content is safe after the repository team publishes that rule."
+    ],
+    "correctAnswers": [
+      "Treat issue content as untrusted data, keep repository policy in trusted instructions, and prevent retrieved text from changing the agent's operating rules.",
+      "Require application-enforced review approval before the merge tool can run, and scope the agent's repository permissions to the minimum required actions."
+    ],
+    "explanation": "The issue tracker is an evidence source rather than an authority over the agent. This option reduces the chance that embedded text becomes a new instruction. It gives the team a reliable way to prevent untrusted issue text from authorizing a sensitive repository action. Labels, prompts, and model capability never replace repository authorization. The agent can use issue context while sensitive changes remain under explicit human control. The MCP result is marked as data and the merge executor verifies an independent approval record. Acceptance testing needs injected issue tests, permission-denied tests, and merge attempts without a matching approval. Any sign of malicious code entering the repository through indirect prompt injection means the design is not ready. Successful cases demonstrate that the workflow can prevent untrusted issue text from authorizing a sensitive repository action. A model instruction alone should not authorize a sensitive repository change. An external approval gate and least privilege limit what an injected issue can cause. That behavior is necessary to prevent untrusted issue text from authorizing a sensitive repository action. The MCP result is marked as data and the merge executor verifies an independent approval record. The implementation uses instruction isolation, least privilege, and an application-enforced merge approval. The agent can use issue context while sensitive changes remain under explicit human control. The test plan should contain injected issue tests, permission-denied tests, and merge attempts without a matching approval. Each case should be examined for malicious code entering the repository through indirect prompt injection. The plan passes when the system can prevent untrusted issue text from authorizing a sensitive repository action."
+  },
+  {
+    "number": 12,
+    "question": "A research assistant has access to a large policy repository, but most questions need only two or three sections. The current design preloads every policy into each conversation and reaches the context limit before analysis begins. Which change best improves the design?",
+    "options": [
+      "Retrieve only the relevant policy sections when the question arrives, then place those sections in context with source identifiers and concise task instructions.",
+      "Split the repository into random equal-sized chunks and rotate one chunk into each request regardless of the user's topic.",
+      "Increase the conversation history limit in the application database so every policy remains available to Claude across more user turns under the defined instruction hierarchy.",
+      "Summarize the complete repository once and replace every source policy with the same short summary for all future questions."
+    ],
+    "correctAnswers": [
+      "Retrieve only the relevant policy sections when the question arrives, then place those sections in context with source identifiers and concise task instructions."
+    ],
+    "explanation": "The application does not need the entire repository for every question. Just-in-time retrieval preserves context for reasoning while keeping the evidence traceable. That behavior is necessary to supply enough policy evidence for the current question without preloading the full repository. Retrieved text is evidence for the current task and is not treated as permanent conversation memory. The assistant spends context on the material that matters for the current question. The application searches indexed policies, returns bounded passages, and includes stable source identifiers. Practical checks include retrieval recall tests, context-size measurements, and answer checks against exact source sections. They are useful for finding context overflow, unsupported answers, or loss of precise policy evidence. Together, they show whether the workflow can supply enough policy evidence for the current question without preloading the full repository."
+  },
+  {
+    "number": 13,
+    "question": "A quality-check prompt contains two rules that conflict: always return a concise answer, and include a detailed explanation for every failed check. Claude alternates between omitting explanations and producing long responses for successful cases. What is the best first correction? Set a very small max_tokens value so the response remains concise even when Claude tries to explain every failed check in detail reliably.",
+    "options": [
+      "Set a very small max_tokens value so the response remains concise even when Claude tries to explain every failed check in detail reliably.",
+      "Rewrite the instructions with an explicit priority and conditional behavior, requiring concise output for passes and detailed explanations only for failed checks.",
+      "Increase the model effort so Claude spends more reasoning tokens deciding which of the two rules should take precedence.",
+      "Add several examples without changing the conflicting rules because demonstrations always override ambiguous written instructions."
+    ],
+    "correctAnswers": [
+      "Rewrite the instructions with an explicit priority and conditional behavior, requiring concise output for passes and detailed explanations only for failed checks."
+    ],
+    "explanation": "The current prompt leaves Claude to reconcile two rules that cannot both apply in every case. A conditional instruction removes the conflict and describes the expected output for each outcome. This makes it possible to produce predictable response detail for passing and failing quality checks. The prompt defines one compact pass format and a separate failure format with required fields. This behavior is provided by clear instruction priority with condition-specific output rules. The model no longer has to guess how two conflicting instructions should interact. Evidence from paired pass and fail cases, mixed-result cases, and checks for complete failure explanations should be collected before release. That evidence should expose missing defect information or unnecessarily verbose successful responses. It should also confirm that the application can produce predictable response detail for passing and failing quality checks."
+  },
+  {
+    "number": 14,
+    "question": "A support agent has access to thousands of internal tools, but only a few are relevant to each ticket. The team wants to keep precise schemas and permissions without placing the full catalog in every request. Which approach best fits? Load all tools once into the first conversation turn and rely on prompt caching to eliminate every later context and selection cost safely. Choose a fixed set of ten popular tools for every ticket and reject requests that require any less common operation. Replace the catalog with one universal run_operation tool that accepts a free-form name and arbitrary JSON for any internal action.",
+    "options": [
+      "Load all tools once into the first conversation turn and rely on prompt caching to eliminate every later context and selection cost safely.",
+      "Choose a fixed set of ten popular tools for every ticket and reject requests that require any less common operation.",
+      "Replace the catalog with one universal run_operation tool that accepts a free-form name and arbitrary JSON for any internal action.",
+      "Use tool search to discover and load relevant tools on demand, while keeping each selected tool's original schema and permission checks intact."
+    ],
+    "correctAnswers": [
+      "Use tool search to discover and load relevant tools on demand, while keeping each selected tool's original schema and permission checks intact."
+    ],
+    "explanation": "Tool search reduces the active catalog without replacing typed interfaces with a generic executor. The selected operations still retain their documented inputs and authorization controls. This directly supports the need to scale to a large tool catalog without losing schemas, permissions, or less common capabilities. The design does not introduce an unrestricted generic operation. The design should use on-demand tool search and loading. The agent remains capable across the full catalog while each turn sees a focused tool set. The release check should include rare-tool discovery tests, unauthorized-tool tests, token measurements, and selection accuracy comparisons. Those cases can expose tool confusion, excessive context, or a generic executor with uncontrolled authority. Clean results show that the system can scale to a large tool catalog without losing schemas, permissions, or less common capabilities."
+  },
+  {
+    "number": 15,
+    "question": "A retail forecasting system has six analysts that all update the same demand plan. The team proposes six peer agents that can message one another and edit the shared forecast whenever they disagree. Which architecture is most likely to keep decisions consistent and recoverable? Run all six agents in one conversation so they share the full transcript and can observe every intermediate calculation. Create six independent forecast files and choose the file produced by the agent that used the largest reasoning budget. Let every agent edit the shared forecast directly and rely on later messages between agents to reconcile conflicting changes before any irreversible action.",
+    "options": [
+      "Run all six agents in one conversation so they share the full transcript and can observe every intermediate calculation.",
+      "Create six independent forecast files and choose the file produced by the agent that used the largest reasoning budget.",
+      "Let every agent edit the shared forecast directly and rely on later messages between agents to reconcile conflicting changes before any irreversible action.",
+      "Use one coordinator to assign bounded analyses, collect structured recommendations, and apply approved updates to the shared forecast in a controlled sequence."
+    ],
+    "correctAnswers": [
+      "Use one coordinator to assign bounded analyses, collect structured recommendations, and apply approved updates to the shared forecast in a controlled sequence."
+    ],
+    "explanation": "A single coordinator creates one place where competing recommendations are compared against the same plan state. This option prevents several workers from changing shared data at the same time. The approach provides enough control to combine independent forecasts without uncontrolled concurrent writes. Specialists can work independently while one component preserves consistency. Each worker reads a versioned snapshot and returns assumptions, confidence, and proposed deltas. Only the coordinator can write the accepted change after checking the current forecast version. Release evidence should include concurrency tests, stale-version simulations, and an audit of accepted versus rejected recommendations. Anything showing conflicting updates, lost changes, or a final plan with no accountable decision path requires another correction. The test results should confirm that the system can combine independent forecasts without uncontrolled concurrent writes."
+  },
+  {
+    "number": 16,
+    "question": "A database migration agent generates a migration, runs it against a disposable copy, and checks the resulting schema. When the check fails, the agent should revise the migration using the failure evidence before testing again. Which pattern best matches this behavior? Use a routing workflow that sends every failed migration to a different model without returning the test results from the previous attempt.",
+    "options": [
+      "Use a routing workflow that sends every failed migration to a different model without returning the test results from the previous attempt.",
+      "Use an evaluator-optimizer loop in which one step proposes the migration and a separate evaluation step returns concrete defects for the next revision under review.",
+      "Use parallel agents that each generate a migration, then deploy the longest migration because it likely covers more edge cases.",
+      "Use a single prompt that asks Claude to write the migration and declare whether the migration would probably pass before any test is run."
+    ],
+    "correctAnswers": [
+      "Use an evaluator-optimizer loop in which one step proposes the migration and a separate evaluation step returns concrete defects for the next revision under review."
+    ],
+    "explanation": "The task naturally alternates between producing a candidate and measuring it against an objective result. The evaluator gives the optimizer specific evidence rather than asking the same prompt to guess whether it succeeded. This meets the stated requirement to revise a migration from concrete execution feedback until the checks pass. The loop runs only against a disposable environment and stops before production deployment. The central choice is an evaluator-optimizer loop with a separate candidate and evaluation stage. Each revision is driven by observable database behavior. Operational testing should use migration test results, iteration counts, unchanged production checks, and a forced nonrecoverable failure. That testing makes self-approved migrations, repeated defects, or an endless retry loop visible. It also proves whether the implementation can revise a migration from concrete execution feedback until the checks pass."
+  },
+  {
+    "number": 17,
+    "question": "A medical application qualifies for Zero Data Retention and repeatedly processes the same small PDF during a short session. The team considers uploading the document through the Files API for convenience. Which design best respects the retention requirement?",
+    "options": [
+      "Send the PDF inline through eligible Messages requests and avoid the Files API unless the organization accepts that feature's separate retention behavior.",
+      "Store the PDF in the system prompt as base64 text because system instructions are never processed or retained as request data.",
+      "Upload the PDF once through the Files API because every Claude feature automatically inherits the organization's Zero Data Retention agreement.",
+      "Upload the file and delete it after the session because manual deletion guarantees that no platform-side retention occurred before the delete request reliably."
+    ],
+    "correctAnswers": [
+      "Send the PDF inline through eligible Messages requests and avoid the Files API unless the organization accepts that feature's separate retention behavior."
+    ],
+    "explanation": "The convenience of a reusable file identifier comes with a different data-retention profile. Inline processing keeps the design aligned with the stated Zero Data Retention requirement for the supported feature. The team can use this approach to process the PDF through a feature compatible with the organization's retention requirement. Convenience and reuse do not override the data-handling agreement. The integration meets the data-handling requirement without relying on an incorrect platform assumption. The service checks feature eligibility during design and sends the document only through the approved request path. The final quality check should cover architecture review of every enabled feature and tests that no file upload endpoint is called. The check is meant to catch a feature choice that violates the medical workload's retention policy. It succeeds only when the system can process the PDF through a feature compatible with the organization's retention requirement."
+  },
+  {
+    "number": 18,
+    "question": "Claude requests three independent read-only tools in one assistant turn. The TypeScript dispatcher currently awaits them one at a time and stops after the first failure: for (const call of calls) results.push(await execute(call)); The application wants low latency and a valid conversation when one lookup fails. Which TWO implementation choices should it make?",
+    "options": [
+      "Execute independent lookups concurrently, while keeping any tool with ordering or side effects out of the parallel group.",
+      "Send successful tool results first and omit the failed call so Claude can continue without being distracted by an unavailable data source.",
+      "Run every tool sequentially because the Messages API requires result order to match the original tool_use block order exactly.",
+      "Return one tool_result for every requested call in the next user message, marking the failed lookup with is_error and the matching tool_use_id safely.",
+      "Retry the failed lookup inside an unlimited loop before returning any results so Claude receives either complete success or no follow-up message."
+    ],
+    "correctAnswers": [
+      "Execute independent lookups concurrently, while keeping any tool with ordering or side effects out of the parallel group.",
+      "Return one tool_result for every requested call in the next user message, marking the failed lookup with is_error and the matching tool_use_id safely."
+    ],
+    "explanation": "Read-only calls that do not share state can safely reduce latency through concurrent execution. The application still decides which operations are independent rather than assuming every tool can run together. The approach provides enough control to execute independent tools efficiently and return a complete result set even when one fails. The dispatcher classifies side effects, gathers bounded tasks, and builds one ordered user content array. Failed or skipped calls are represented explicitly rather than omitted. Claude can combine available evidence while understanding exactly which lookup failed. Release evidence should include parallel timing tests, one-tool failure tests, identifier matching, and retry-limit checks. Anything showing invalid tool history, unnecessary latency, or a request blocked by one unavailable system requires another correction. The test results should confirm that the system can execute independent tools efficiently and return a complete result set even when one fails. Claude needs a result for each tool call, including one that the application could not complete. A structured error preserves the conversation contract and lets Claude respond using the successful results. This gives the application a practical way to execute independent tools efficiently and return a complete result set even when one fails. The design uses safe concurrency plus one identified result for every tool call. The dispatcher classifies side effects, gathers bounded tasks, and builds one ordered user content array. Failed or skipped calls are represented explicitly rather than omitted. Acceptance testing needs parallel timing tests, one-tool failure tests, identifier matching, and retry-limit checks. Any sign of invalid tool history, unnecessary latency, or a request blocked by one unavailable system means the design is not ready. Successful cases demonstrate that the workflow can execute independent tools efficiently and return a complete result set even when one fails."
+  },
+  {
+    "number": 19,
+    "question": "A team upgrades the model used for strict tool calls because the newer release performs better on general coding benchmarks. After deployment, a small number of valid business requests choose different tools than before. What should the team have done before promotion? Promote the model based on benchmark results and add more examples only after users report which production requests changed behavior.",
+    "options": [
+      "Promote the model based on benchmark results and add more examples only after users report which production requests changed behavior.",
+      "Run task-specific tool-selection and schema-adherence evaluations on the candidate model, then compare failures and breaking behavior against the pinned production version.",
+      "Rely on strict tool schemas alone because schema validation guarantees that Claude will always select the same correct tool for an equivalent request.",
+      "Use an unpinned model alias so future upgrades arrive continuously and individual behavior changes remain too small to require a migration."
+    ],
+    "correctAnswers": [
+      "Run task-specific tool-selection and schema-adherence evaluations on the candidate model, then compare failures and breaking behavior against the pinned production version."
+    ],
+    "explanation": "General benchmark gains do not prove compatibility with the application's tools and prompts. A model upgrade should be treated as a behavioral dependency change measured on the actual workflow. The application can therefore detect application-specific behavioral changes before a model upgrade reaches production. External benchmark scores do not replace the application's acceptance criteria. The best fit here is pinned-version comparison using tool-selection and schema-adherence evaluations. Model improvements are adopted only when the actual application behavior remains acceptable. Run tool confusion matrices, strict-schema error rates, business-rule checks, and rollback tests as part of the final test cycle. The test cycle should fail when it finds valid but incorrect tool calls after an apparently successful model upgrade. Otherwise, it should confirm that the system can detect application-specific behavioral changes before a model upgrade reaches production."
+  },
+  {
+    "number": 20,
+    "question": "A customer-support application calls the Claude Messages API through the official SDK. During traffic spikes, some requests fail with 429 rate_limit_error or 529 overloaded_error, while malformed requests occasionally return 400 invalid_request_error. The team wants a recovery strategy that handles temporary failures without repeatedly sending requests that cannot succeed. Which implementation best meets these requirements?",
+    "options": [
+      "Which implementation best meets these requirements?",
+      "Retry transient failures such as rate limits and server errors with backoff, while fixing non-retriable request errors before sending them again.",
+      "Retry only 400 responses after a short delay because malformed requests usually indicate temporary validation problems that the Claude API resolves automatically.",
+      "Immediately resend every failed request several times before applying backoff so temporary capacity problems can be cleared without increasing normal request latency.",
+      "Retry every failed request with exponential backoff because all Claude API errors can eventually succeed after enough attempts without changing the original request."
+    ],
+    "correctAnswers": [
+      "Retry transient failures such as rate limits and server errors with backoff, while fixing non-retriable request errors before sending them again."
+    ],
+    "explanation": "Transient API failures should be treated differently from errors caused by the request itself. A 429 indicates that the application has reached a rate limit, while a 529 means the API is temporarily overloaded. These conditions can improve without changing the request, so retrying them is reasonable. The official Anthropic SDKs already retry common transient failures with exponential backoff. They also honor the retry-after header when it is provided. This prevents the application from immediately repeating a request when the API has told it to wait. A 400 invalid_request_error is different because the request format or content must be corrected. Repeating the same invalid request does not address the underlying problem. Separating retriable failures from request errors therefore gives the application a more reliable recovery strategy."
+  },
+  {
+    "number": 21,
+    "question": "A request contains this configuration: { \"thinking\":{ \"type\":\"adaptive\" }, \"temperature\":0.2, \"tool_choice\":{ \"type\":\"tool\", \"name\":\"approve_claim\" } } The API rejects the request before generation. The request still needs adaptive reasoning and tool use within supported compatibility rules. Which TWO corrections should the developer make?",
+    "options": [
+      "The API rejects the request before generation. The request still needs adaptive reasoning and tool use within supported compatibility rules. Which TWO corrections should the developer make?",
+      "Remove the custom temperature setting because the selected thinking mode does not support that sampling control in the same request reliably.",
+      "Retry the same request with exponential backoff because unsupported combinations are temporary availability errors that clear after a short delay.",
+      "Move temperature and tool_choice into the user message so Claude can follow them as natural-language instructions instead of API parameters.",
+      "Increase max_tokens until the request succeeds because parameter conflicts occur only when the thinking budget leaves too little response capacity.",
+      "Replace the forced-tool configuration with a supported tool-choice mode, or disable thinking when forced selection is an absolute requirement."
+    ],
+    "correctAnswers": [
+      "Remove the custom temperature setting because the selected thinking mode does not support that sampling control in the same request reliably.",
+      "Replace the forced-tool configuration with a supported tool-choice mode, or disable thinking when forced selection is an absolute requirement."
+    ],
+    "explanation": "Thinking features have explicit compatibility rules for sampling parameters. Removing the unsupported setting addresses one deterministic cause of the validation failure. The choice works because the application has to submit a supported combination of thinking, sampling, and tool-choice settings. The design uses model-specific compatibility validation before request submission. The configuration layer rejects incompatible combinations and exposes the required tradeoff to the feature owner. Invalid requests never enter a retry loop or rely on prompt text to emulate API controls. The acceptance set should contain request-matrix tests for thinking modes, sampling parameters, and each tool-choice option. These examples help uncover repeated production failures caused by incompatible request features. A passing result shows that the application can submit a supported combination of thinking, sampling, and tool-choice settings. The application must choose a combination that the selected model accepts. This option makes the tradeoff explicit instead of treating thinking and forced selection as independently composable. This directly supports the need to submit a supported combination of thinking, sampling, and tool-choice settings. The configuration layer rejects incompatible combinations and exposes the required tradeoff to the feature owner. Invalid requests never enter a retry loop or rely on prompt text to emulate API controls. The application uses reasoning controls only through documented request shapes. Run request-matrix tests for thinking modes, sampling parameters, and each tool-choice option as part of the final test cycle. The test cycle should fail when it finds repeated production failures caused by incompatible request features. Otherwise, it should confirm that the system can submit a supported combination of thinking, sampling, and tool-choice settings."
+  },
+  {
+    "number": 22,
+    "question": "A CI job currently starts Claude Code with this command and then waits for interactive input: claude \"Review the current pull request\" The pipeline needs machine-readable output and must fail when the review cannot complete. The result will feed an automated merge gate without a person watching the terminal. Which invocation pattern best fits? Start a normal interactive Claude Code session in the CI terminal and wait until the model decides that the review is complete. Run the desktop application through a virtual display because the graphical interface provides more complete review context than the CLI. Pipe the pull request diff into a shell command that calls the Messages API directly and treat any text response as a successful Claude Code review.",
+    "options": [
+      "Start a normal interactive Claude Code session in the CI terminal and wait until the model decides that the review is complete.",
+      "Run the desktop application through a virtual display because the graphical interface provides more complete review context than the CLI.",
+      "Pipe the pull request diff into a shell command that calls the Messages API directly and treat any text response as a successful Claude Code review.",
+      "Run Claude Code in headless print mode with the required prompt and structured output setting, then check the process exit status before accepting the result."
+    ],
+    "correctAnswers": [
+      "Run Claude Code in headless print mode with the required prompt and structured output setting, then check the process exit status before accepting the result."
+    ],
+    "explanation": "A noninteractive pipeline needs a command that completes and returns output without waiting for a terminal conversation. Structured output and the exit status give CI a stable contract for parsing and failure handling. The proposed choice allows the service to run a repository review noninteractively with parseable output and reliable failure detection. The job does not depend on a desktop session or an unattended interactive prompt. Claude Code becomes a predictable CI step while retaining repository-aware behavior. CI supplies the prompt, repository context, and output format through supported CLI flags. The test plan should contain successful review fixtures, invalid configuration tests, timeout handling, and nonzero exit-code assertions. Each case should be examined for hung pipelines, unparseable results, or false success after an incomplete review. The plan passes when the system can run a repository review noninteractively with parseable output and reliable failure detection."
+  },
+  {
+    "number": 23,
+    "question": "A stream produces this sequence: HTTP 200 -> message_start -> text_delta -> text_delta -> error_event The user interface has shown the partial text, but the database stores it as a completed answer. The service must preserve partial progress without marking a failed turn as complete. What should the application change? Treat HTTP 200 as proof of success and keep the partial database record because later stream events cannot change the status of the request. Append a generic completion sentence to the partial text whenever an error event occurs and store the result as the final answer. Hide all text until the stream ends so the application never has to distinguish provisional output from a completed response.",
+    "options": [
+      "Treat HTTP 200 as proof of success and keep the partial database record because later stream events cannot change the status of the request.",
+      "Append a generic completion sentence to the partial text whenever an error event occurs and store the result as the final answer.",
+      "Hide all text until the stream ends so the application never has to distinguish provisional output from a completed response.",
+      "Mark streamed content as provisional, persist a completed answer only after the final message is assembled, and record the error with the request identifier consistently."
+    ],
+    "correctAnswers": [
+      "Mark streamed content as provisional, persist a completed answer only after the final message is assembled, and record the error with the request identifier consistently."
+    ],
+    "explanation": "An error can occur after the streaming connection has already returned a successful HTTP status. The partial text may help the user understand progress, but it is not a complete durable response. The option addresses the central requirement to display partial streaming progress without saving an incomplete answer as final. The design uses provisional UI state and completion-aware persistence. The stream aggregator commits only after a terminal completion event and stores failures separately. Partial deltas never become an authoritative answer merely because they were visible. Confidence should come from mid-stream failure injection, database state checks, and recovery tests using the request identifier. The checks must detect incomplete text being treated as final or a failed response appearing complete. The team should also verify that the service can display partial streaming progress without saving an incomplete answer as final."
+  },
+  {
+    "number": 24,
+    "question": "A utility company wants Claude to read inspection photos and produce a repair priority. The request says the system should be accurate and fast, but it does not define confidence handling or the evidence needed for a decision. Which TWO requirements should the team add before choosing the implementation? Require the application to use the largest Claude model and assume that model size will satisfy both accuracy and latency expectations. Store every inspection image indefinitely so engineers can review any disagreement after the system is released.",
+    "options": [
+      "Require the application to use the largest Claude model and assume that model size will satisfy both accuracy and latency expectations.",
+      "Store every inspection image indefinitely so engineers can review any disagreement after the system is released.",
+      "Specify the maximum response time and the required output fields, including the evidence references that support each repair recommendation.",
+      "Ask developers to optimize the prompt until sample outputs look reasonable to the inspection manager during an informal demonstration.",
+      "Define measurable acceptance criteria for priority accuracy, including representative image conditions and the treatment of low-confidence or unreadable evidence within service limits."
+    ],
+    "correctAnswers": [
+      "Define measurable acceptance criteria for priority accuracy, including representative image conditions and the treatment of low-confidence or unreadable evidence within service limits.",
+      "Specify the maximum response time and the required output fields, including the evidence references that support each repair recommendation."
+    ],
+    "explanation": "The team needs a testable definition of correct behavior across normal and difficult inspection images. This option turns the vague word accurate into observable outcomes and an explicit uncertainty policy. The design remains centered on the requirement to translate accuracy, speed, uncertainty, and evidence needs into measurable acceptance criteria. Model and architecture decisions can be compared against the same business definition of success. The requirements document names representative image classes, low-confidence behavior, response fields, and review conditions. Implementation choices remain open until the team can test candidate designs against the same criteria. The implementation should be tried against an acceptance suite covering clear, damaged, low-light, and unreadable inspection images. Those tests are likely to reveal a design appearing useful without consistent acceptance evidence. The desired outcome is proof that the service can translate accuracy, speed, uncertainty, and evidence needs into measurable acceptance criteria. Latency and output structure affect model choice, request design, and downstream review. This option gives engineering a concrete service target and a verifiable result contract. The application can therefore translate accuracy, speed, uncertainty, and evidence needs into measurable acceptance criteria. Implementation choices remain open until the team can test candidate designs against the same criteria. The best fit here is explicit quality thresholds, latency targets, and an output contract. Model and architecture decisions can be compared against the same business definition of success. The design can be exercised through an acceptance suite covering clear, damaged, low-light, and unreadable inspection images. These tests reveal signs of a design appearing useful without consistent acceptance evidence. They provide clear evidence that the application can translate accuracy, speed, uncertainty, and evidence needs into measurable acceptance criteria."
+  },
+  {
+    "number": 25,
+    "question": "A semiconductor plant uses Claude to diagnose equipment alarms before technicians enter a restricted area. A fixed lockout checklist must always run first, while the diagnostic path can vary with sensor evidence. Which TWO architecture decisions best meet these requirements?",
+    "options": [
+      "Start a bounded diagnostic agent only after lockout, and restrict it to approved read-only sensor and maintenance tools within fixed limits.",
+      "Give one autonomous agent every safety and diagnostic tool, then ask it to decide which checks each alarm requires.",
+      "Keep the lockout checklist in a deterministic workflow that must succeed before Claude can inspect diagnostic evidence.",
+      "Replace the checklist with a detailed system prompt that tells Claude to perform the safety steps in the preferred order.",
+      "Run the diagnostic agent before the lockout workflow so it can gather more context for the technician's entry decision."
+    ],
+    "correctAnswers": [
+      "Keep the lockout checklist in a deterministic workflow that must succeed before Claude can inspect diagnostic evidence.",
+      "Start a bounded diagnostic agent only after lockout, and restrict it to approved read-only sensor and maintenance tools within fixed limits."
+    ],
+    "explanation": "The lockout sequence is mandatory and has a known order that should not depend on model judgment. This option protects the safety gate before any adaptive analysis begins. The option addresses the central requirement to run every lockout check before allowing adaptive diagnosis. The agent receives read-only evidence tools and cannot change the lockout state. The plant gains flexible troubleshooting without weakening its physical safety controls. The workflow records each lockout result, then hands a verified state token to the diagnostic agent. Confidence should come from safety workflow traces, tool permission tests, and alarm cases with incomplete lockout results. The checks must detect a diagnosis being issued before lockout completion or a mandatory check being skipped. The final check is whether the service can run every lockout check before allowing adaptive diagnosis. The diagnostic work is open ended, so an agent can choose evidence within a carefully limited tool set. This option gives Claude flexibility without expanding its authority over the safety procedure. The design remains centered on the requirement to run every lockout check before allowing adaptive diagnosis. The workflow records each lockout result, then hands a verified state token to the diagnostic agent. This behavior is provided by a fixed workflow for the safety gate and a bounded agent for uncertain investigation. The plant gains flexible troubleshooting without weakening its physical safety controls. Release evidence should include safety workflow traces, tool permission tests, and alarm cases with incomplete lockout results. Anything showing a diagnosis being issued before lockout completion or a mandatory check being skipped requires another correction. Passing these checks shows that the system can run every lockout check before allowing adaptive diagnosis."
+  },
+  {
+    "number": 26,
+    "question": "A multi-tenant agent calls an internal finance API on behalf of signed-in employees. The current design gives every agent session one shared long-lived service token with broad account access. Which credential design is safer? Create one permanent token per department because a smaller group makes long-lived credentials safe enough for financial operations. Let Claude choose which employee identity to place in an API header based on the user's message and the conversation history. Keep the shared token but hide it in the system prompt so Claude can use it without returning the value in visible text.",
+    "options": [
+      "Create one permanent token per department because a smaller group makes long-lived credentials safe enough for financial operations.",
+      "Let Claude choose which employee identity to place in an API header based on the user's message and the conversation history.",
+      "Keep the shared token but hide it in the system prompt so Claude can use it without returning the value in visible text.",
+      "Issue short-lived credentials scoped to the authenticated employee and requested finance actions, then validate that identity again when each sensitive tool executes."
+    ],
+    "correctAnswers": [
+      "Issue short-lived credentials scoped to the authenticated employee and requested finance actions, then validate that identity again when each sensitive tool executes."
+    ],
+    "explanation": "The finance API should receive authority that reflects the current user and task. Short lifetime and narrow scope reduce the damage from token theft or an agent mistake. This makes it possible to call sensitive finance tools with authority tied to the verified user and current action. The model never stores, selects, or invents the user's authentication identity. The central choice is short-lived, user-scoped credentials with execution-time authorization. Each tool call carries only the authority needed for the authenticated employee's task. Evidence from cross-tenant access tests, expired-token tests, scope-denial tests, and audit correlation to the employee should be collected before release. That evidence should expose broad financial access from a leaked or misused shared credential. It should also confirm that the application can call sensitive finance tools with authority tied to the verified user and current action."
+  },
+  {
+    "number": 27,
+    "question": "A design platform needs Claude to browse approved templates, create a new project from a selected template, and offer users a tested briefing starter. The team is deciding how to expose each capability through MCP. Which TWO mappings are correct? Expose project creation as a resource because the resulting project identifier is data that Claude can read after the operation finishes.",
+    "options": [
+      "Expose project creation as a resource because the resulting project identifier is data that Claude can read after the operation finishes.",
+      "Expose project creation as a tool and publish the tested briefing starter as a prompt that users can invoke with the required arguments.",
+      "Expose the template catalog as prompts because each template can be represented as reusable text that users select from a list.",
+      "Expose the approved template catalog as resources so the application can list and read template data without asking Claude to perform an action safely.",
+      "Expose all three capabilities as tools so Claude controls discovery, creation, and the user's choice of briefing workflow."
+    ],
+    "correctAnswers": [
+      "Expose the approved template catalog as resources so the application can list and read template data without asking Claude to perform an action safely.",
+      "Expose project creation as a tool and publish the tested briefing starter as a prompt that users can invoke with the required arguments."
+    ],
+    "explanation": "Templates are contextual data that the host may browse or insert into the conversation. Resources fit data retrieval controlled by the application. The result is a system that can map data, side effects, and user-invoked templates to the correct MCP primitives. The design uses resources for context data, tools for actions, and prompts for reusable user workflows. The server declares each primitive with a clear schema and the host exposes the appropriate control surface. Model control is limited to actions that should actually be selected and executed by Claude. The team can test the decision with primitive discovery tests, project side-effect tests, and user invocation of the briefing prompt. The most important failure to catch is side effects being treated as data access or users losing control of workflows. The expected result is consistent evidence that the system can map data, side effects, and user-invoked templates to the correct MCP primitives. Creating a project is an action with side effects, which belongs in a tool. A reusable briefing starter is a user-invoked interaction template, which fits an MCP prompt. It is a direct match for the requirement to map data, side effects, and user-invoked templates to the correct MCP primitives. The server declares each primitive with a clear schema and the host exposes the appropriate control surface. Model control is limited to actions that should actually be selected and executed by Claude. Each capability follows the MCP control model that matches its purpose. The final quality check should cover primitive discovery tests, project side-effect tests, and user invocation of the briefing prompt. The check is meant to catch side effects being treated as data access or users losing control of workflows. It succeeds only when the system can map data, side effects, and user-invoked templates to the correct MCP primitives."
+  },
+  {
+    "number": 28,
+    "question": "A shipping company describes a new assistant with the following needs: it must summarize customs documents, preserve customer isolation, recover from regional failure, and return within six seconds. The architecture review must separate what the application does from the conditions under which it operates. Which classification is correct? Treat regional recovery as functional and classify summarization, isolation, and latency as nonfunctional because only recovery changes system behavior.",
+    "options": [
+      "Treat regional recovery as functional and classify summarization, isolation, and latency as nonfunctional because only recovery changes system behavior.",
+      "Treat document summarization as a functional requirement. Classify tenant isolation, regional recovery, and the six-second target as nonfunctional requirements.",
+      "Treat all four needs as functional requirements because each one can be observed during an end-to-end test of the shipping assistant consistently.",
+      "Treat the six-second target as functional and classify the remaining needs as implementation details that do not belong in the requirements."
+    ],
+    "correctAnswers": [
+      "Treat document summarization as a functional requirement. Classify tenant isolation, regional recovery, and the six-second target as nonfunctional requirements."
+    ],
+    "explanation": "Summarization describes the service behavior that users request. Isolation, resilience, and latency describe quality and operating constraints that shape how the service is built. The approach provides enough control to distinguish user-visible behavior from quality, security, resilience, and latency constraints. The design uses functional and nonfunctional requirement classification. The team records the summarization contract separately from service-level and isolation constraints. Requirements describe outcomes without prematurely fixing a particular deployment technology. Release evidence should include a requirements review that maps each item to acceptance tests and architecture decisions. Anything showing optimizing the wrong quality attribute or omitting a required operating constraint requires another correction. If the checks pass, the team knows the system can distinguish user-visible behavior from quality, security, resilience, and latency constraints."
+  },
+  {
+    "number": 29,
+    "question": "A batch contains thousands of document requests, and a small number fail while the rest complete. The downstream pipeline must match every result to its source document and retry only the failed work. Which TWO practices should the developer use? Assume results are returned in the same order as requests, then pair each output with the document at the same array position. Use the document filename as custom_id without checking uniqueness because files in separate folders cannot collide during batch processing. Retry the entire original batch whenever any request fails so every document is processed under one consistent attempt number.",
+    "options": [
+      "Assume results are returned in the same order as requests, then pair each output with the document at the same array position.",
+      "Use the document filename as custom_id without checking uniqueness because files in separate folders cannot collide during batch processing.",
+      "Retry the entire original batch whenever any request fails so every document is processed under one consistent attempt number.",
+      "Inspect each request result separately, persist successful outputs, and build a new batch containing only retryable failures with new attempt tracking.",
+      "Assign a stable unique custom_id to every batch request and store its relationship to the source document before submitting the batch per request."
+    ],
+    "correctAnswers": [
+      "Assign a stable unique custom_id to every batch request and store its relationship to the source document before submitting the batch per request.",
+      "Inspect each request result separately, persist successful outputs, and build a new batch containing only retryable failures with new attempt tracking."
+    ],
+    "explanation": "The batch result order should not be used as the document identity. A stable custom identifier lets the pipeline join each result back to the correct source record. This directly supports the need to map asynchronous batch results accurately and retry only failed requests. Successful outputs are immutable and are not resubmitted with the failed subset. Large asynchronous jobs remain traceable at the individual document level. The pipeline stores source mappings, classifies each result, and submits a separate retry batch for eligible failures. The release check should include mixed-result batch tests, duplicate filename tests, and reconciliation of every custom identifier. Those cases can expose misassigned outputs, duplicate processing, or unnecessary batch cost. Clean results show that the system can map asynchronous batch results accurately and retry only failed requests. A batch can contain a mix of successful and failed requests. Handling results independently prevents successful work from being repeated and preserves a clear retry history. The scenario depends on the system being able to map asynchronous batch results accurately and retry only failed requests. The pipeline stores source mappings, classifies each result, and submits a separate retry batch for eligible failures. The required control comes from stable custom identifiers and per-request result handling. Large asynchronous jobs remain traceable at the individual document level. Useful evidence comes from mixed-result batch tests, duplicate filename tests, and reconciliation of every custom identifier. The team should watch for misassigned outputs, duplicate processing, or unnecessary batch cost. The evidence is complete only when the application can map asynchronous batch results accurately and retry only failed requests."
+  },
+  {
+    "number": 30,
+    "question": "A Claude Code plugin works on developer laptops but fails in CI because the pipeline resolves a newer dependency and does not load the same marketplace configuration. The team wants local and automated runs to use the same reviewed extension set. What should it do? Disable the plugin in CI and accept that automated runs will use fewer capabilities than developers use during local testing. Copy the plugin files into the CI image manually and stop tracking the plugin source or version after the image is built.",
+    "options": [
+      "Disable the plugin in CI and accept that automated runs will use fewer capabilities than developers use during local testing.",
+      "Copy the plugin files into the CI image manually and stop tracking the plugin source or version after the image is built.",
+      "Version the plugin configuration and dependency lock information with the repository, then make CI verify and install the same approved versions before running Claude Code.",
+      "Tell developers to reinstall the plugin whenever CI fails because fresh installation usually resolves temporary marketplace or dependency problems."
+    ],
+    "correctAnswers": [
+      "Version the plugin configuration and dependency lock information with the repository, then make CI verify and install the same approved versions before running Claude Code."
+    ],
+    "explanation": "The failure comes from configuration and dependency drift between environments. A repository-controlled manifest and lock make the extension set reproducible in both locations. It is a direct match for the requirement to reproduce the same approved plugin and dependency configuration in local and CI environments. The repository records marketplace and plugin settings while the pipeline fails closed on unexpected versions. CI does not fetch an arbitrary latest extension or use an undocumented copied package. The extension behaves as a controlled project dependency rather than a developer preference. Use clean-environment installation tests, effective-configuration inspection, and checksum or lock validation to check the completed behavior. These cases should surface environment-specific failures, unreviewed dependency changes, or missing automated coverage. Passing them demonstrates that the workflow can reproduce the same approved plugin and dependency configuration in local and CI environments."
+  },
+  {
+    "number": 31,
+    "question": "A coding service uses one capable model for both short lint explanations and difficult repository-wide debugging. The team wants lower routine cost without introducing a second model family unless evaluations show it is necessary. Which approach should it test first? Move all lint tasks to the smallest model immediately and skip evaluation because lint explanations are inherently simple and deterministic. Use maximum effort for every request because the most capable setting always minimizes total cost by avoiding any chance of a second attempt.",
+    "options": [
+      "Move all lint tasks to the smallest model immediately and skip evaluation because lint explanations are inherently simple and deterministic.",
+      "Use maximum effort for every request because the most capable setting always minimizes total cost by avoiding any chance of a second attempt.",
+      "Evaluate lower effort for routine lint tasks and higher effort for complex debugging. Compare quality, latency, and token use before promotion.",
+      "Keep one setting and shorten every prompt because effort affects only visible prose length and cannot influence tool use or reasoning behavior."
+    ],
+    "correctAnswers": [
+      "Evaluate lower effort for routine lint tasks and higher effort for complex debugging. Compare quality, latency, and token use before promotion."
+    ],
+    "explanation": "Effort can change how much response work the same supported model performs. The team can reduce routine spending without immediately adding routing complexity across several model families. For this case, the design must reduce routine cost while preserving difficult debugging quality with minimal routing complexity. The service labels task classes, runs evals at several effort levels, and sets approved defaults. The required control comes from task-specific effort evaluation on the same model before adding model routing. The team uses a simpler control before introducing a broader multi-model architecture. Useful evidence comes from lint and debugging eval suites, latency percentiles, tool-call counts, and token-cost comparisons. The team should watch for excess cost on simple tasks or quality loss after an untested model change. The evidence is complete only when the application can reduce routine cost while preserving difficult debugging quality with minimal routing complexity."
+  },
+  {
+    "number": 32,
+    "question": "A TypeScript response handler uses the following default branch: switch (block.type) { case \"text\": return renderText(block); case \"tool_use\": return runTool(block); default: return undefined; } A new supported block type is silently ignored in production. The team wants the compiler to expose missing handlers when the content union changes. Which change best prevents this class of defect?",
+    "options": [
+      "switch (block.type) {",
+      "A new supported block type is silently ignored in production. The team wants the compiler to expose missing handlers when the content union changes. Which change best prevents this class of defect?",
+      "Keep the default branch and log unknown blocks at debug level so the application can continue without interrupting user responses.",
+      "Serialize each unknown block to a string and append it to the visible answer so no information is discarded by the parser.",
+      "Use a discriminated union with an exhaustive switch and a compile-time never check, then add fixtures for every supported content block type.",
+      "Cast every response block to a text block because text is the most common type and most new blocks also contain readable fields."
+    ],
+    "correctAnswers": [
+      "Use a discriminated union with an exhaustive switch and a compile-time never check, then add fixtures for every supported content block type."
+    ],
+    "explanation": "The block type is already the discriminator that TypeScript can use to narrow each case. An exhaustive check makes an unhandled future type visible during development instead of silently dropping it. The approach stays focused on the requirement to detect unsupported response block types before they are silently ignored. The response layer evolves safely as the API adds supported content types. The parser switches on the block discriminator and routes every known type to a dedicated handler. Unknown types fail clearly in development and are not converted into user text by default. Confidence should come from unit fixtures for all current block types and a synthetic unknown-type build test. The checks must detect lost content, incorrect tool handling, or accidental exposure of internal blocks. The evidence should show that the service can detect unsupported response block types before they are silently ignored."
+  },
+  {
+    "number": 33,
+    "question": "A server-tool request returns the following response after several web operations: { \"stop_reason\":\"pause_turn\", \"content\":[ { \"type\":\"text\", \"text\":\"I have gathered the first sources.\" } ] } The server-side loop has not completed the user's task. The client still has the accumulated assistant content and tool history. What should the application do? Discard the returned content and repeat the original request so the server tools can start again with a clean execution context. Convert every server_tool_use block into a client tool_result block and submit those results as if the application had executed the tools.",
+    "options": [
+      "The server-side loop has not completed the user's task. The client still has the accumulated assistant content and tool history. What should the application do?",
+      "Discard the returned content and repeat the original request so the server tools can start again with a clean execution context.",
+      "Convert every server_tool_use block into a client tool_result block and submit those results as if the application had executed the tools.",
+      "Append the returned assistant content to the conversation and send a follow-up Messages request so Claude can continue the paused server-tool loop.",
+      "Treat pause_turn as a final answer and display only the latest text block because all server tools have already finished successfully under versioning."
+    ],
+    "correctAnswers": [
+      "Append the returned assistant content to the conversation and send a follow-up Messages request so Claude can continue the paused server-tool loop."
+    ],
+    "explanation": "A pause turn indicates that the server-side loop needs another model turn rather than a fresh conversation. Returning the content preserves the completed tool work and gives Claude the state it needs to continue. It is a direct match for the requirement to continue an incomplete server-tool loop without losing completed tool work. The client does not re-execute server tools or invent tool results. The central choice is a follow-up Messages request that includes the returned paused assistant content. Long server-tool tasks can continue across turns with their state intact. Use tests that force pause_turn, count repeated tool operations, and confirm one final answer to check the completed behavior. These cases should surface partial answers, duplicated server-tool work, or malformed conversation state. Passing them demonstrates that the workflow can continue an incomplete server-tool loop without losing completed tool work."
+  },
+  {
+    "number": 34,
+    "question": "A production service uses a moving model alias in configuration, and an overnight provider update changes output behavior without a code release. The team needs predictable deployments and a controlled way to adopt new capabilities. Which configuration strategy should it use?",
+    "options": [
+      "Pin an explicit supported model version in each release, evaluate candidate versions separately, and promote the chosen identifier through the normal deployment pipeline.",
+      "Keep the moving alias and record the current model name in logs because logging is sufficient to reproduce any behavior change later during rollout.",
+      "Hard-code the latest model identifier in several application modules so a provider update cannot alter the deployed code automatically.",
+      "Allow each instance to select the newest available model at startup and compare production results after all instances have restarted."
+    ],
+    "correctAnswers": [
+      "Pin an explicit supported model version in each release, evaluate candidate versions separately, and promote the chosen identifier through the normal deployment pipeline."
+    ],
+    "explanation": "A pinned identifier makes the runtime behavior part of the versioned release. Candidate models can be tested and approved without silently changing the production service. This is important because the team must make model behavior a predictable and reviewable part of each application release. Production never follows a moving alias without an approved release change. The key decision is to use explicit version pinning with evaluated promotion. New model capabilities can be adopted deliberately without sacrificing release control. The design can be exercised through configuration snapshots, candidate evals, canary comparisons, and rollback to the prior identifier. These tests reveal signs of silent behavior changes, mixed model versions, or an unreproducible incident. They provide clear evidence that the application can make model behavior a predictable and reviewable part of each application release."
+  },
+  {
+    "number": 35,
+    "question": "A legal filing agent can prepare documents but must pause for a client's signature or clarification. The TypeScript handler currently throws whenever the SDK asks for input: if (message.type === \"user_input_request\") throw new Error(\"Agent failed\"); The workflow must resume from the same session instead of restarting the legal analysis. Which change best preserves progress and keeps the client in control? Discard the paused session and create a new session containing only the clarification response supplied by the client.",
+    "options": [
+      "Discard the paused session and create a new session containing only the clarification response supplied by the client.",
+      "Surface the agent's approval or clarification request to the client, retain the session, and continue that same session after receiving the response.",
+      "Automatically choose the lowest-risk interpretation, finish the filing, and notify the client that the agent resolved the ambiguity on their behalf when needed.",
+      "Increase the maximum turn count so the agent keeps reasoning until it selects an answer without asking the client."
+    ],
+    "correctAnswers": [
+      "Surface the agent's approval or clarification request to the client, retain the session, and continue that same session after receiving the response."
+    ],
+    "explanation": "A request for user input is part of the agent workflow rather than an application failure. Continuing the same session preserves the filing draft and the decisions already made. This is the right choice because the system must pause for client input without losing completed filing work. The application stores the session identifier, displays the question, and sends the client's response back through the supported input flow. The implementation uses a resumable session that surfaces approval and clarification requests. The client remains the decision maker while the agent keeps its progress. Verification should rely on tests for approval requests, conflicting instructions, client cancellation, and session resume after a delay. The evidence must rule out unauthorized legal choices or duplicate work after a restart. It must also demonstrate the ability to pause for client input without losing completed filing work."
+  },
+  {
+    "number": 36,
+    "question": "A billing assistant retries a request after a transient API failure. The model may call a charge tool, and the first attempt could have completed the charge before the network response was lost. Which implementation best avoids duplicate charges?",
+    "options": [
+      "Disable all retries whenever a tool can change data, even when the API failure occurs before Claude returns any tool call.",
+      "Give the charge operation an application-generated idempotency key, record its outcome durably, and return the existing result when the same key is retried.",
+      "Generate a new transaction identifier for every retry so the payment system can distinguish each attempt in its audit log.",
+      "Ask Claude in the next prompt whether it already charged the customer and proceed only when the model says the charge is new consistently."
+    ],
+    "correctAnswers": [
+      "Give the charge operation an application-generated idempotency key, record its outcome durably, and return the existing result when the same key is retried."
+    ],
+    "explanation": "A network failure does not prove that the side effect failed. An idempotent operation lets the application repeat the request without creating a second charge. This is how the team can retry an uncertain tool workflow without repeating a financial side effect. The design uses application-level idempotency tied to durable operation state. The executor creates or looks up a charge by idempotency key before returning a tool result. Model reasoning never decides whether a transaction already exists. Before deployment, run lost-response simulations, repeated tool calls with the same key, and concurrent duplicate requests. These checks are designed to reveal double charging a customer or refusing recoverable requests. They also confirm that the service can retry an uncertain tool workflow without repeating a financial side effect."
+  },
+  {
+    "number": 37,
+    "question": "A public-sector assistant receives requests about permits, tax balances, and service outages. Each category has different tools and rules, but a request should use only the specialist that matches its intent. Which pattern should the developer implement? Give one general agent every permit, tax, and outage tool so it can decide freely which systems to call during each conversation under review. Run all three specialists for every request and ask a coordinator to choose the response that appears most complete. Store the three policies in one system prompt and answer without tools unless the user explicitly names the backend system.",
+    "options": [
+      "Give one general agent every permit, tax, and outage tool so it can decide freely which systems to call during each conversation under review.",
+      "Run all three specialists for every request and ask a coordinator to choose the response that appears most complete.",
+      "Store the three policies in one system prompt and answer without tools unless the user explicitly names the backend system.",
+      "Use a routing step that classifies the request against defined categories, then sends it to the matching specialist with only that specialist's tools."
+    ],
+    "correctAnswers": [
+      "Use a routing step that classifies the request against defined categories, then sends it to the matching specialist with only that specialist's tools."
+    ],
+    "explanation": "The first decision is choosing the correct capability rather than coordinating several specialists on every request. Routing keeps unrelated tools and policies out of the selected specialist's context. The scenario depends on the system being able to send each request to one appropriate specialist with the minimum relevant tools. The selected specialist cannot discover or call tools belonging to another category. Each request uses a focused context and a smaller authority surface. The router returns a constrained category and the application selects the corresponding prompt, tools, and policy. Testing should cover routing confusion tests, unauthorized tool-call tests, and representative requests for every category. A failure would point to unnecessary system access, incorrect routing, or conflicting answers from several specialists. Passing the tests confirms the ability to send each request to one appropriate specialist with the minimum relevant tools."
+  },
+  {
+    "number": 38,
+    "question": "An application requests strict JSON but receives this response for a prohibited request: { \"stop_reason\":\"refusal\", \"content\":[ { \"type\":\"text\", \"text\":\"I cannot assist with that request.\" } ] } The parser assumes every response matches the business schema and crashes. The application must handle safety outcomes before attempting business-schema validation. What should the developer change? Strip all text before the first opening brace and parse whatever remains because refusals often include a usable JSON object after the warning. Catch the JSON exception and replace the missing object with a default approval so the downstream workflow can continue without interruption.",
+    "options": [
+      "The parser assumes every response matches the business schema and crashes. The application must handle safety outcomes before attempting business-schema validation. What should the developer change?",
+      "Strip all text before the first opening brace and parse whatever remains because refusals often include a usable JSON object after the warning.",
+      "Catch the JSON exception and replace the missing object with a default approval so the downstream workflow can continue without interruption.",
+      "Inspect the response blocks and stop reason before business-schema parsing, then route refusals and other nonstandard outcomes through explicit application handling for the current task.",
+      "Retry the same prohibited request until Claude returns schema-conforming JSON because strict output mode guarantees eventual compliance."
+    ],
+    "correctAnswers": [
+      "Inspect the response blocks and stop reason before business-schema parsing, then route refusals and other nonstandard outcomes through explicit application handling for the current task."
+    ],
+    "explanation": "Structured output constraints do not eliminate every possible response state. The parser must distinguish a valid business object from a refusal or another terminal condition. This is important because the team must handle refusals and nonbusiness response states without crashing or fabricating a decision. The handler branches on block types and stop reasons, then validates JSON only for eligible completed responses. A default object never substitutes for a refusal or an incomplete response. Structured output remains reliable because exceptional response states are handled deliberately. The design can be exercised through refusal fixtures, valid strict JSON cases, truncation cases, and unknown block tests. These tests reveal signs of application crashes or unauthorized actions caused by a fabricated fallback object. They provide clear evidence that the application can handle refusals and nonbusiness response states without crashing or fabricating a decision."
+  },
+  {
+    "number": 39,
+    "question": "A fraud-review prompt has been replaced by a new version and the initial canary is healthy. The old version still serves a small rollback pool, and several scheduled jobs reference it directly. What should the team do before retiring the old version? Redirect the old version identifier to the new prompt without changing caller records or documenting the behavioral change. Delete the old prompt immediately because the canary passed, then fix any scheduled job that reports a missing configuration during its next run. Keep both versions indefinitely and allow each application owner to choose whichever prompt produces the output they prefer.",
+    "options": [
+      "Redirect the old version identifier to the new prompt without changing caller records or documenting the behavioral change.",
+      "Delete the old prompt immediately because the canary passed, then fix any scheduled job that reports a missing configuration during its next run.",
+      "Keep both versions indefinitely and allow each application owner to choose whichever prompt produces the output they prefer.",
+      "Inventory remaining callers and migrate scheduled jobs. Confirm the new version against production metrics, then retain a tested rollback path until retirement under versioning."
+    ],
+    "correctAnswers": [
+      "Inventory remaining callers and migrate scheduled jobs. Confirm the new version against production metrics, then retain a tested rollback path until retirement under versioning."
+    ],
+    "explanation": "A healthy canary does not prove that every caller has moved or that delayed workloads behave correctly. This option completes the lifecycle work before the old version and its rollback value disappear. That behavior is necessary to retire the old prompt without breaking delayed callers or losing rollback capability. Owners update versioned configuration, exercise scheduled workloads, and remove the old artifact only after the agreed window. The system supports this with caller inventory, staged migration, production validation, and controlled decommissioning. The team completes the change as a managed lifecycle event rather than a prompt edit. Practical checks include caller scans, scheduled-job test runs, canary metrics, and a rehearsed rollback. They are useful for finding late job failures, hidden version drift, or no recovery path after a regression. Together, they show whether the workflow can retire the old prompt without breaking delayed callers or losing rollback capability."
+  },
+  {
+    "number": 40,
+    "question": "A Python service creates a new HTTP client for every Claude request: def call_claude(payload): with httpx.Client() as client: return client.post(URL, json=payload) Under load it has connection churn, no explicit timeout policy, and inconsistent transient retries. The team wants predictable transport behavior while continuing to call the Claude API directly. Which change best improves the integration? Retry every failed request in a tight loop inside the request handler so transient network errors disappear before the user notices.",
+    "options": [
+      "Under load it has connection churn, no explicit timeout policy, and inconsistent transient retries. The team wants predictable transport behavior while continuing to call the Claude API directly. Which change best improves the integration?",
+      "Retry every failed request in a tight loop inside the request handler so transient network errors disappear before the user notices.",
+      "Reuse a configured HTTP client with connection pooling, explicit timeouts, and bounded retry handling that follows Claude API error semantics.",
+      "Increase the operating system file descriptor limit and continue creating a new client because connection setup is too small to affect application reliability.",
+      "Move the API key into a query parameter so intermediaries can reuse cached HTTP responses for identical Claude requests."
+    ],
+    "correctAnswers": [
+      "Reuse a configured HTTP client with connection pooling, explicit timeouts, and bounded retry handling that follows Claude API error semantics."
+    ],
+    "explanation": "Connection reuse reduces repeated setup overhead and gives the service a central place for transport policy. Timeouts and bounded retries prevent one request from occupying resources indefinitely. The proposed choice allows the service to operate raw HTTP calls efficiently with explicit transport and retry controls. The REST integration gains predictable transport behavior comparable to a well-configured SDK client. The client centralizes headers, connection limits, deadlines, and retry classification. The service never places credentials in URLs or retries terminal errors. The test plan should contain load tests, connection-reuse metrics, timeout injection, and 429 or 5xx retry tests. Each case should be examined for socket exhaustion, request pileups, retry storms, or exposed credentials. The plan passes when the system can operate raw HTTP calls efficiently with explicit transport and retry controls."
+  },
+  {
+    "number": 41,
+    "question": "Claude Code may write configuration files that contain secrets copied from logs. The current settings run a scanner only after writes: { \"hooks\":{ \"PostToolUse\":[ { \"matcher\":\"Write|Edit\", \"hooks\":[ { \"type\":\"command\", \"command\":\"./scan-secrets.sh\" } ] } ] } } The team wants the write blocked before the file changes and wants Claude to receive a clear reason. Which hook design should it use? Use a Notification hook after each session and ask the developer to review every changed file manually for possible secrets. Use a PostToolUse hook that deletes the file after a secret is detected because cleanup is sufficient when the repository is not yet committed. Add a CLAUDE.md rule that says never copy secrets and omit hooks because project instructions are always enforced deterministically.",
+    "options": [
+      "The team wants the write blocked before the file changes and wants Claude to receive a clear reason. Which hook design should it use?",
+      "Use a Notification hook after each session and ask the developer to review every changed file manually for possible secrets.",
+      "Use a PostToolUse hook that deletes the file after a secret is detected because cleanup is sufficient when the repository is not yet committed.",
+      "Add a CLAUDE.md rule that says never copy secrets and omit hooks because project instructions are always enforced deterministically.",
+      "Configure a PreToolUse hook for file-write tools that scans the proposed content, blocks detected secrets, and returns a specific remediation message to Claude."
+    ],
+    "correctAnswers": [
+      "Configure a PreToolUse hook for file-write tools that scans the proposed content, blocks detected secrets, and returns a specific remediation message to Claude."
+    ],
+    "explanation": "The check must run before the write tool changes the repository. A blocking hook can enforce the policy and explain what Claude must remove before trying again. This makes it possible to block secret-bearing file content before Claude Code writes it. The hook matches write tools, runs a secret scanner, and returns an actionable denial reason. The implementation uses a blocking PreToolUse hook that inspects proposed write content. The policy is enforced at the action boundary while Claude receives enough feedback to correct the change. Evidence from seeded secret tests, false-positive cases, hook exit-code checks, and retry after redaction should be collected before release. That evidence should expose credentials reaching repository files, local history, or downstream automation. It should also confirm that the application can block secret-bearing file content before Claude Code writes it."
+  },
+  {
+    "number": 42,
+    "question": "A development team wants project coding rules to load in every Claude Code session, while a lengthy release procedure should load only when someone performs a release. The team also wants a specialized security reviewer to work in an isolated context. Which TWO configuration choices fit these needs? Store the release procedure in auto memory and expect Claude to reconstruct the approved steps after observing one successful release.",
+    "options": [
+      "Store the release procedure in auto memory and expect Claude to reconstruct the approved steps after observing one successful release.",
+      "Define the security reviewer as a subagent with focused instructions and limited tools so its analysis runs outside the main session context.",
+      "Put the coding rules, release procedure, and security checklist into one large CLAUDE.md so every session receives the complete project playbook.",
+      "Place concise always-on coding rules in CLAUDE.md and move the release procedure into an invocable Skill that loads only when relevant.",
+      "Create a shell alias that starts three Claude Code sessions with the same full context and let the user choose which response to trust."
+    ],
+    "correctAnswers": [
+      "Place concise always-on coding rules in CLAUDE.md and move the release procedure into an invocable Skill that loads only when relevant.",
+      "Define the security reviewer as a subagent with focused instructions and limited tools so its analysis runs outside the main session context."
+    ],
+    "explanation": "Project rules belong in the context that every session needs. The longer procedure is better kept on demand so routine coding turns do not carry it. The approach provides enough control to separate always-on rules, on-demand procedures, and isolated specialist work. The repository versions each component in its supported location and gives the subagent a narrow tool set. This behavior is provided by CLAUDE.md for concise context, Skills for reusable workflows, and subagents for isolation. Each extension loads at the scope and time that matches its purpose. Release evidence should include configuration inspection, context-load checks, Skill invocation tests, and subagent permission tests. Anything showing context bloat, unreviewed procedures, or a security reviewer with excessive authority requires another correction. The evidence is sufficient only when the system can separate always-on rules, on-demand procedures, and isolated specialist work. A security review benefits from specialized instructions and context isolation. A subagent can return a concise finding without filling the main conversation with its intermediate work. This is how the team can separate always-on rules, on-demand procedures, and isolated specialist work. Long procedures and specialist working notes do not enter every main-session request. Each extension loads at the scope and time that matches its purpose. The repository versions each component in its supported location and gives the subagent a narrow tool set. Acceptance testing needs configuration inspection, context-load checks, Skill invocation tests, and subagent permission tests. Any sign of context bloat, unreviewed procedures, or a security reviewer with excessive authority means the design is not ready. Successful cases demonstrate that the workflow can separate always-on rules, on-demand procedures, and isolated specialist work."
+  },
+  {
+    "number": 43,
+    "question": "A request includes a system prompt, twenty tool definitions, two images, and a long conversation. The developer counts only the visible text messages and assumes the remaining space can be used for the answer. Which TWO corrections are needed? Estimate each image as one token because image content is referenced by a single block in the JSON request.",
+    "options": [
+      "Estimate each image as one token because image content is referenced by a single block in the JSON request.",
+      "Reserve sufficient context and max_tokens capacity for the expected response instead of filling the window with input up to its limit per workload.",
+      "Count the complete structured request before sending it. Include system content and tool definitions as well as images and every message block.",
+      "Set max_tokens equal to the full context window because the API automatically subtracts the input and generates only what remains.",
+      "Exclude tool definitions from the estimate because tools are metadata and are billed only when Claude actually selects one."
+    ],
+    "correctAnswers": [
+      "Count the complete structured request before sending it. Include system content and tool definitions as well as images and every message block.",
+      "Reserve sufficient context and max_tokens capacity for the expected response instead of filling the window with input up to its limit per workload."
+    ],
+    "explanation": "All request components consume context even when they are not ordinary text messages. The total input estimate must reflect the same structured payload that Claude will process. It gives the team a reliable way to estimate the full request and preserve enough capacity for the intended answer. The service sends the actual message shape to the token-counting endpoint before choosing truncation or routing. No component is ignored merely because it appears as metadata or a nontext block. Routing and prompt reduction decisions use the same payload that Claude will actually receive. Acceptance testing needs count comparisons for tools and images, near-limit requests, and expected response-length tests. Any sign of context overflow, premature truncation, or a response too short for the task means the design is not ready. Successful cases demonstrate that the workflow can estimate the full request and preserve enough capacity for the intended answer. The response needs room inside the model's overall context and the configured generation limit. A request that barely fits the input can still fail to produce the required answer. That behavior is necessary to estimate the full request and preserve enough capacity for the intended answer. The design uses token counting on the structured payload plus explicit output budgeting. The service sends the actual message shape to the token-counting endpoint before choosing truncation or routing. No component is ignored merely because it appears as metadata or a nontext block. The test plan should contain count comparisons for tools and images, near-limit requests, and expected response-length tests. Each case should be examined for context overflow, premature truncation, or a response too short for the task. The plan passes when the system can estimate the full request and preserve enough capacity for the intended answer."
+  },
+  {
+    "number": 44,
+    "question": "An Agent SDK service runs on several stateless containers behind a load balancer. The current Python code stores session identifiers only in process memory: sessions[user_id] = result.session_id Users must resume a long investigation even when the next request reaches a different container. Which implementation should the developer choose? Start a new Agent SDK session for every request and paste the user's latest message into the new session as context.",
+    "options": [
+      "Start a new Agent SDK session for every request and paste the user's latest message into the new session as context.",
+      "Persist session transcripts and identifiers in shared external storage, then resume the requested session from whichever container receives the next request with oversight.",
+      "Keep each session only in process memory and configure the load balancer to prefer the container that handled the first request.",
+      "Store only the final assistant response in a database and ask Claude to infer the missing session history when the user returns."
+    ],
+    "correctAnswers": [
+      "Persist session transcripts and identifiers in shared external storage, then resume the requested session from whichever container receives the next request with oversight."
+    ],
+    "explanation": "A stateless host cannot guarantee that later traffic returns to the process that started the investigation. External session storage lets any healthy instance restore the same conversation state. This directly supports the need to resume the same investigation across stateless compute instances. The design uses durable session storage keyed by a stable session identifier. The service mirrors transcripts to shared storage and loads them before calling the SDK resume operation. Container memory remains a cache rather than the authoritative session record. Verification should rely on container termination tests, cross-host resume tests, and transcript integrity checks. The evidence must rule out lost context, repeated tool calls, or a resumed session that belongs to the wrong user. It must also demonstrate the ability to resume the same investigation across stateless compute instances."
+  },
+  {
+    "number": 45,
+    "question": "A code-execution agent analyzes customer datasets inside a managed sandbox. The agent needs package access but must not send customer data to arbitrary internet hosts. Which deployment control best enforces this requirement? Provide the sandbox with the production customer API key so it can verify whether outgoing requests contain authorized account information. Disable all package installation and internet access because a secure sandbox cannot permit any external connection under any circumstances. Add a system instruction telling Claude never to upload customer data, while leaving unrestricted internet access available for troubleshooting.",
+    "options": [
+      "Provide the sandbox with the production customer API key so it can verify whether outgoing requests contain authorized account information.",
+      "Disable all package installation and internet access because a secure sandbox cannot permit any external connection under any circumstances.",
+      "Add a system instruction telling Claude never to upload customer data, while leaving unrestricted internet access available for troubleshooting.",
+      "Use a sandbox with explicit network egress restrictions and an allowlist for approved package sources, then keep customer credentials outside the execution environment."
+    ],
+    "correctAnswers": [
+      "Use a sandbox with explicit network egress restrictions and an allowlist for approved package sources, then keep customer credentials outside the execution environment."
+    ],
+    "explanation": "Network policy should enforce where the code can connect rather than relying on the model to remember a rule. An allowlist supports the required package access while blocking unrelated data destinations. The proposed choice allows the service to allow approved package access while preventing arbitrary network exfiltration. The design uses sandbox egress controls with a narrow destination allowlist. Network policy permits known registries and denies other destinations at the infrastructure layer. Customer credentials and broad internet access are not exposed to generated code. The test plan should contain blocked-domain tests, approved registry downloads, DNS bypass tests, and credential absence checks. Each case should be examined for customer data leaving the sandbox through generated code or a compromised dependency. The plan passes when the system can allow approved package access while preventing arbitrary network exfiltration."
+  },
+  {
+    "number": 46,
+    "question": "An engineering organization wants to distribute one approved package that adds a release Skill, two subagents, repository hooks, and an MCP connection. Teams should install and update the package through a controlled internal catalog. Which customization mechanism is the best fit?",
+    "options": [
+      "Package the components as a Claude Code plugin and distribute it through an approved organization marketplace with reviewed versions and update controls.",
+      "Place all content in one user-level CLAUDE.md file so each developer receives the package automatically across every repository.",
+      "Publish only the release procedure as an MCP prompt because MCP prompts can carry every customization component inside one reusable template.",
+      "Copy the Skill and agents into every repository, then add hooks and MCP settings manually because repository files provide the strongest central control."
+    ],
+    "correctAnswers": [
+      "Package the components as a Claude Code plugin and distribute it through an approved organization marketplace with reviewed versions and update controls."
+    ],
+    "explanation": "A plugin is designed to bundle several Claude Code extension types into one installable unit. An organization marketplace gives teams a managed channel for discovery and versioned distribution. This meets the stated requirement to distribute several related Claude Code extensions as one controlled and updateable package. The plugin manifest declares bundled components and the marketplace pins reviewed releases. The system supports this with a plugin delivered through an approved organization marketplace. The organization can manage one reusable package instead of many copied files. Operational testing should use clean installation tests, component discovery, version upgrade tests, and marketplace policy checks. That testing makes extension drift, inconsistent hooks, or unreviewed MCP connections across repositories visible. It also proves whether the implementation can distribute several related Claude Code extensions as one controlled and updateable package."
+  },
+  {
+    "number": 47,
+    "question": "A service classifies errors with this Python logic: if 400 <= status < 500: raise PermanentFailure() else: retry() It drops 429 responses with retry-after but retries malformed 400 requests elsewhere. The policy must distinguish request correction from rate-limit recovery. Which change best corrects the error policy? Retry 400 and 429 responses with the same fixed delay because a single policy is easier to operate and monitor. Retry every 4xx response immediately because client-side failures often disappear when a different Claude model handles the next request. Treat every 4xx response as terminal so the service never risks creating a retry storm during periods of high traffic with explicit failure state.",
+    "options": [
+      "if 400 <= status < 500:",
+      "It drops 429 responses with retry-after but retries malformed 400 requests elsewhere. The policy must distinguish request correction from rate-limit recovery. Which change best corrects the error policy?",
+      "Retry 400 and 429 responses with the same fixed delay because a single policy is easier to operate and monitor.",
+      "Retry every 4xx response immediately because client-side failures often disappear when a different Claude model handles the next request.",
+      "Treat every 4xx response as terminal so the service never risks creating a retry storm during periods of high traffic with explicit failure state.",
+      "Classify 429 as transient and honor retry-after with bounded backoff, while treating invalid 400 requests as terminal until the request is corrected."
+    ],
+    "correctAnswers": [
+      "Classify 429 as transient and honor retry-after with bounded backoff, while treating invalid 400 requests as terminal until the request is corrected."
+    ],
+    "explanation": "The two status codes represent different failure conditions and need different recovery behavior. This option waits as instructed for rate limits and avoids repeating a request that the server will continue to reject. The team can use this approach to recover from temporary rate limits without retrying invalid requests. The service responds to each API failure according to its actual recovery path. The handler maps error types to retry rules, attempt limits, and correction paths. Only transient failures enter the retry queue and malformed requests require code or data changes. The final quality check should cover simulated 400 and 429 responses, retry timing checks, and an attempt-limit test. The check is meant to catch retry storms, dropped recoverable work, or endless retries of invalid input. It succeeds only when the system can recover from temporary rate limits without retrying invalid requests."
+  },
+  {
+    "number": 48,
+    "question": "A company is exposing a central inventory service to Claude clients in several offices. The server runs remotely, must authenticate users through the corporate identity provider, and should support standard HTTP infrastructure. Which MCP design best fits? Put one shared API key in every Claude client configuration and rely on office network location to identify the requesting employee. Expose the inventory operations as unauthenticated resources because resources are read-only and therefore cannot reveal sensitive business data. Use stdio transport across the public network because standard input and output avoid the overhead of HTTP authentication and session handling through typed interfaces.",
+    "options": [
+      "Put one shared API key in every Claude client configuration and rely on office network location to identify the requesting employee.",
+      "Expose the inventory operations as unauthenticated resources because resources are read-only and therefore cannot reveal sensitive business data.",
+      "Use stdio transport across the public network because standard input and output avoid the overhead of HTTP authentication and session handling through typed interfaces.",
+      "Deploy a remote MCP server over Streamable HTTP, protect it with the supported OAuth flow, and validate user scopes for each inventory operation."
+    ],
+    "correctAnswers": [
+      "Deploy a remote MCP server over Streamable HTTP, protect it with the supported OAuth flow, and validate user scopes for each inventory operation."
+    ],
+    "explanation": "Streamable HTTP is the transport intended for remote MCP communication through standard web infrastructure. OAuth and per-operation scope checks connect tool authority to the authenticated user. This directly supports the need to provide a remote MCP service with corporate identity and operation-level access control. Multiple Claude clients can use one remotely managed service with consistent authorization. The server validates tokens, maps scopes to tools or resources, and records the authenticated user. Local stdio and shared secrets are not used as substitutes for remote user authentication. Verification should rely on OAuth flow tests, insufficient-scope tests, transport reconnection tests, and user audit records. The evidence must rule out unauthenticated inventory access or actions performed under an untraceable shared identity. It must also demonstrate the ability to provide a remote MCP service with corporate identity and operation-level access control."
+  },
+  {
+    "number": 49,
+    "question": "A compliance application sends scanned reports through Amazon Bedrock Converse using this document configuration: {\"document\":{\"format\":\"pdf\",\"name\":\"report\",\"source\":{\"bytes\":\"...\"}}} Claude sees extracted text but misses charts, and the application must analyze visual evidence. The selected interface must process both the text and the visual page content reliably. Which TWO changes are appropriate?",
+    "options": [
+      "Enable citations for the Converse document request so the supported full visual PDF processing mode is used instead of text extraction alone.",
+      "Convert each report to plain text before submission because the model can infer chart trends from nearby captions and surrounding paragraphs.",
+      "Add regression cases containing charts and tables, then confirm the returned answer cites evidence from the expected visual regions.",
+      "Switch to synchronous InvokeModel calls only because Converse never supports visual PDF analysis under any request configuration.",
+      "Increase max_tokens so the model has enough output capacity to inspect visual content that the request currently does not expose."
+    ],
+    "correctAnswers": [
+      "Enable citations for the Converse document request so the supported full visual PDF processing mode is used instead of text extraction alone.",
+      "Add regression cases containing charts and tables, then confirm the returned answer cites evidence from the expected visual regions."
+    ],
+    "explanation": "On this interface, citations are the switch that enables visual understanding for PDF pages. This option addresses why charts are missing even though text extraction succeeds. The result is a system that can analyze PDF charts through the selected cloud interface rather than receiving text extraction only. The request enables citations and the application verifies cited chart evidence in known documents. The team does not assume identical PDF behavior across every provider interface. The application uses the full document content that the compliance review requires. The team can test the decision with reports with known chart values, citations to the expected pages, and a negative test without the setting. The most important failure to catch is compliance conclusions that ignore visual evidence. The expected result is consistent evidence that the system can analyze PDF charts through the selected cloud interface rather than receiving text extraction only. The team needs an interface-specific test that proves visual content is actually being used. This option prevents a request-format change from silently falling back to text-only behavior. The team can use this approach to analyze PDF charts through the selected cloud interface rather than receiving text extraction only. The design uses interface-specific PDF configuration plus visual regression tests. The request enables citations and the application verifies cited chart evidence in known documents. The team does not assume identical PDF behavior across every provider interface. Evidence from reports with known chart values, citations to the expected pages, and a negative test without the setting should be collected before release. That evidence should expose compliance conclusions that ignore visual evidence. It should also confirm that the application can analyze PDF charts through the selected cloud interface rather than receiving text extraction only."
+  },
+  {
+    "number": 50,
+    "question": "A media company must transcribe an interview, translate the transcript, and then generate subtitles with the translated timing. Each stage depends on the exact output of the previous stage. Which execution strategy should the workflow use? Generate subtitles first from the audio, translate them afterward, and accept any timing differences introduced by the translated text. Let one agent perform all stages in a single unrestricted conversation and keep every intermediate audio analysis block in context. Run all three stages in parallel with the original audio so the workflow finishes sooner, then merge whichever outputs are available.",
+    "options": [
+      "Generate subtitles first from the audio, translate them afterward, and accept any timing differences introduced by the translated text.",
+      "Let one agent perform all stages in a single unrestricted conversation and keep every intermediate audio analysis block in context.",
+      "Run all three stages in parallel with the original audio so the workflow finishes sooner, then merge whichever outputs are available.",
+      "Run the stages sequentially and pass a versioned structured result from transcription to translation and then to subtitle generation."
+    ],
+    "correctAnswers": [
+      "Run the stages sequentially and pass a versioned structured result from transcription to translation and then to subtitle generation."
+    ],
+    "explanation": "Translation requires the completed transcript, and subtitle generation requires both translated text and timing information. A sequential flow preserves the dependency chain and makes each handoff explicit. This makes it possible to preserve exact dependencies between transcription, translation, and subtitle timing. Each stage validates its input contract and stores an output that the next stage can resume from. Only independent work inside a stage may run concurrently. The pipeline remains reproducible and can recover from the last completed stage. Evidence from handoff schema tests, timing alignment checks, and restart tests after each stage should be collected before release. That evidence should expose subtitle timing mismatches, lost timing data, or a complete restart after a late failure. It should also confirm that the application can preserve exact dependencies between transcription, translation, and subtitle timing."
+  },
+  {
+    "number": 51,
+    "question": "A risk analyst treats the probability of Claude's selected next token as a calibrated probability that the final business conclusion is correct. The team wants to use that value as an automatic approval threshold. Why is this approach unsound? Next-token probabilities are unavailable for Claude responses, so the proposal fails only because the API cannot return any generation likelihood information. The value would be reliable if the team used a lower temperature because deterministic generation guarantees that the conclusion is factually correct. The value becomes calibrated after the prompt includes several examples because few-shot prompting converts token probabilities into task-level accuracy estimates.",
+    "options": [
+      "Next-token probabilities are unavailable for Claude responses, so the proposal fails only because the API cannot return any generation likelihood information.",
+      "The value would be reliable if the team used a lower temperature because deterministic generation guarantees that the conclusion is factually correct.",
+      "The value becomes calibrated after the prompt includes several examples because few-shot prompting converts token probabilities into task-level accuracy estimates.",
+      "Next-token probabilities describe local generation choices, not a calibrated confidence score for the correctness of the completed business decision."
+    ],
+    "correctAnswers": [
+      "Next-token probabilities describe local generation choices, not a calibrated confidence score for the correctness of the completed business decision."
+    ],
+    "explanation": "The model generates one token at a time based on the preceding context. A high local probability does not measure whether the reasoning, source data, or final conclusion is correct. The workflow can then avoid confusing token-generation likelihood with business-decision confidence. The team measures decision accuracy on labeled cases and defines an escalation rule from observed performance. The system supports this with task-level evaluation and calibrated application metrics. Approval thresholds are tied to measured task behavior rather than a misunderstood model signal. Release evidence should include holdout evaluations, reliability analysis by confidence band, and manual review of high-risk cases. Anything showing an incorrect decision being approved because one generation value looked high requires another correction. The evidence is sufficient only when the system can avoid confusing token-generation likelihood with business-decision confidence."
+  },
+  {
+    "number": 52,
+    "question": "An insurance assistant analyzes photographs and PDFs uploaded by customers. The files may contain visible or hidden personal identifiers that are not needed for the coverage decision. Which design best reduces unnecessary data exposure? Keep all original uploads indefinitely because a longer retention period makes later dispute resolution more accurate and therefore more secure. Send the complete files because Claude needs every available detail, then ask the model not to mention personal information in its final answer per user.",
+    "options": [
+      "Keep all original uploads indefinitely because a longer retention period makes later dispute resolution more accurate and therefore more secure.",
+      "Send the complete files because Claude needs every available detail, then ask the model not to mention personal information in its final answer per user.",
+      "Preprocess inputs to remove unneeded identifiers, send only the minimum relevant pages or image regions, and restrict retained outputs to the approved decision record.",
+      "Encrypt the files before including them in the request so Claude can analyze the content without the platform seeing the original information."
+    ],
+    "correctAnswers": [
+      "Preprocess inputs to remove unneeded identifiers, send only the minimum relevant pages or image regions, and restrict retained outputs to the approved decision record."
+    ],
+    "explanation": "The service should reduce sensitive data before it enters the model request. Minimizing input and retention limits exposure while preserving the evidence required for the coverage task. The result is a system that can use customer evidence without processing or retaining unnecessary personal identifiers. The application uses only the information necessary for the insurance task. The application redacts fields, selects relevant pages or regions, and stores only approved outputs. Output instructions do not justify sending unrelated sensitive source data. The team can test the decision with PII detection tests, request-payload inspection, and retention-policy enforcement checks. The most important failure to catch is data leakage, excessive retention, or exposure of identifiers unrelated to the decision. The expected result is consistent evidence that the system can use customer evidence without processing or retaining unnecessary personal identifiers."
+  },
+  {
+    "number": 53,
+    "question": "A claims workflow drafts a decision and then asks the same conversation to confirm that its own answer is correct. The confirmation almost always agrees with the draft, even when a known policy exception was missed. Which prompt design is more likely to expose the error?",
+    "options": [
+      "Use a separate verification step with the policy, the draft, and an explicit checklist that asks for unsupported claims and missed exceptions before finalization.",
+      "Repeat the drafting prompt a second time and accept the result when both responses use similar wording and reach the same decision under explicit instructions.",
+      "Ask the original conversation to answer yes or no after the draft because a direct confirmation question minimizes unnecessary reasoning.",
+      "Increase temperature for the confirmation turn so the model explores a wider range of possible endorsements of the original decision."
+    ],
+    "correctAnswers": [
+      "Use a separate verification step with the policy, the draft, and an explicit checklist that asks for unsupported claims and missed exceptions before finalization."
+    ],
+    "explanation": "The verifier needs a task that is different from simply endorsing the draft. A checklist and fresh step direct attention to failure modes that the first generation may have overlooked. This is important because the system must challenge a draft for missed exceptions rather than merely asking the model to agree with itself. The draft is treated as an object to inspect, not as trusted reasoning that must be preserved. The central choice is a separate verification prompt with a failure-focused checklist. The workflow gives the final decision an independent and explicit quality check. Confidence should come from cases with seeded policy exceptions, false-positive checks, and comparison with single-pass performance. The checks must detect the same drafting error being accepted without an independent check. The team should also verify that the service can challenge a draft for missed exceptions rather than merely asking the model to agree with itself."
+  }
+]

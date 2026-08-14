@@ -1,0 +1,767 @@
+[
+  {
+    "number": 1,
+    "question": "A due-diligence agent must analyze financial, legal, and security documents that do not depend on one another, then produce one consolidated risk report. The team wants lower latency without mixing specialist context. Which pattern should it use? Run the three specialist analyses sequentially in one shared conversation. Preserve all raw outputs even though no specialist depends on another's result. Generate the final report before specialist analysis begins. Run the reviews only when a user later gives the report a negative rating. Ask one agent to switch specialties after every paragraph. Keep all source documents and intermediate reasoning in the same working context. One growing context would contain every specialist perspective.",
+    "options": [
+      "Run the three specialist analyses sequentially in one shared conversation. Preserve all raw outputs even though no specialist depends on another's result.",
+      "Generate the final report before specialist analysis begins. Run the reviews only when a user later gives the report a negative rating.",
+      "Ask one agent to switch specialties after every paragraph. Keep all source documents and intermediate reasoning in the same working context. One growing context would contain every specialist perspective.",
+      "Run isolated specialist subagents in parallel because their analyses are independent. Send their bounded findings to a final synthesis step after all three complete."
+    ],
+    "correctAnswers": [
+      "Run isolated specialist subagents in parallel because their analyses are independent. Send their bounded findings to a final synthesis step after all three complete."
+    ],
+    "explanation": "The three specialist analyses are independent and can execute concurrently. Separate subagent contexts prevent one domain's documents and instructions from distracting another. That behavior directly addresses parallelizing independent analysis while preserving one consolidated result. A synthesis step can receive concise findings after all specialists finish. The coordinator then reconciles risks without loading every raw document into one context. The design keeps control in the correct layer by recognizing that subagents suit isolated work that a parent agent can coordinate and synthesize. This pattern reduces elapsed time while preserving specialization. It also creates clearer evidence about which analysis produced each finding. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 2,
+    "question": "A trace shows that the order lookup tool returned the correct delivery date, but the assistant's final message states a different date. The API request completed successfully and the tool result is visible in the trace. Where should the developer investigate first? tool_result: {\"order_id\":\"A19\",\"delivery_date\":\"2026-08-04\"} assistant_text: \"Your order will arrive on August 14.\" Investigate the order database first. Treat every date disagreement as proof that the executor queried a stale record. The investigation would focus on data freshness first. Investigate the network transport first. Treat a successful API response as proof that the model could not have received the tool result.",
+    "options": [
+      "Investigate the order database first. Treat every date disagreement as proof that the executor queried a stale record. The investigation would focus on data freshness first.",
+      "Investigate the network transport first. Treat a successful API response as proof that the model could not have received the tool result.",
+      "Inspect the model-output and orchestration path. Verify that the tool result used the correct block and influenced the final response as intended.",
+      "Inspect rate-limit settings first. Assume incorrect order dates are a documented consequence of exceeding the service request quota. The investigation would attribute content errors to quota settings."
+    ],
+    "correctAnswers": [
+      "Inspect the model-output and orchestration path. Verify that the tool result used the correct block and influenced the final response as intended."
+    ],
+    "explanation": "The trace indicates that the external lookup produced the expected value. The discrepancy appears after the tool result enters the conversation. That behavior directly addresses locating whether the failure occurred in the tool layer or the model response. The developer should verify the tool-use identifier, returned block, subsequent assistant request, and final answer handling. The prompt may also need a rule to ground the date in the tool result. The design keeps control in the correct layer by recognizing that trace evidence should identify the first point where observed behavior diverged. This investigation isolates the failure to the model-output or orchestration layer. It avoids changing a data source that already returned correct evidence. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 3,
+    "question": "A desktop coding workflow needs safe file editing inside the working directory and a proprietary release-approval operation owned by the company. The team wants to reuse Anthropic-provided capabilities where suitable. Which TWO choices best fit?",
+    "options": [
+      "Implement release approval as a narrowly scoped custom tool or MCP capability. Keep authorization and final execution under application-controlled policy. The application would authorize the operation before execution.",
+      "Use Claude Code's built-in file-editing capability for repository changes. Keep those edits within the configured permission boundary and normal review workflow. Repository edits would remain subject to configured approvals.",
+      "Use one unrestricted shell command for repository editing and release approval. Let the model perform both responsibilities through the same broad capability.",
+      "Represent proprietary release approval as a detailed system prompt. Expect those instructions to authenticate users and update the internal deployment service directly.",
+      "Replace file editing with an MCP prompt. Require the user to paste every modified file into the conversation before requesting release approval."
+    ],
+    "correctAnswers": [
+      "Use Claude Code's built-in file-editing capability for repository changes. Keep those edits within the configured permission boundary and normal review workflow. Repository edits would remain subject to configured approvals.",
+      "Implement release approval as a narrowly scoped custom tool or MCP capability. Keep authorization and final execution under application-controlled policy. The application would authorize the operation before execution."
+    ],
+    "explanation": "Built-in file tools already provide structured operations for reading and editing repository content. Their use can be governed through Claude Code permissions and review. That behavior directly addresses using the appropriate tool type for each required capability. Reusing the existing capability avoids writing another file manipulation layer. The working directory and allowed actions remain visible in configuration. The design keeps control in the correct layer by recognizing that built-in tools and custom tools have different implementation and approval boundaries. This is an appropriate use of a built-in tool because the required behavior matches the provided capability. The team can focus custom work on the proprietary operation. This also makes the solution easier to verify and maintain in production. Release approval is an organization-specific action that requires internal authentication and policy checks. A custom tool or MCP server can expose only the necessary operation. The result aligns with using the appropriate tool type for each required capability. The application or server remains responsible for verifying identity and authorization. Claude receives a clear schema without obtaining general access to the release system. The implementation therefore follows the documented rule that built-in tools and custom tools have different implementation and approval boundaries. This separation supports least privilege and reuse. It also lets the company maintain approval logic independently of the coding workflow. The team can therefore achieve clear ownership and safer external actions without adding unnecessary complexity."
+  },
+  {
+    "number": 4,
+    "question": "A developer asks Claude Code to modernize a widely used authentication module. The change spans many files and could silently alter security behavior if reviewed as one large patch. Which software-engineering approach should the team use? Disable version control during the modernization. Let Claude Code reorganize files without producing intermediate commits that reviewers could inspect separately. The team would lose incremental history and rollback points.",
+    "options": [
+      "Disable version control during the modernization. Let Claude Code reorganize files without producing intermediate commits that reviewers could inspect separately. The team would lose incremental history and rollback points.",
+      "Split the modernization into bounded changes and preserve focused tests. Review each diff and run integration checks before the complete refactor is merged.",
+      "Approve all mechanical changes automatically. Validate the refactor only from the final source tree rather than reviewing incremental diffs. Review would occur only after the complete rewrite.",
+      "Ask Claude Code to rewrite the entire module in one pass. Merge after compilation because a successful build supposedly proves authentication behavior remains correct."
+    ],
+    "correctAnswers": [
+      "Split the modernization into bounded changes and preserve focused tests. Review each diff and run integration checks before the complete refactor is merged."
+    ],
+    "explanation": "Bounded changes make a large refactor easier to understand and verify. Reviewers can connect each diff to a specific modernization goal instead of interpreting one broad rewrite. The result aligns with modernizing widely used code without silently changing security behavior. Focused tests protect existing behavior while integration checks reveal problems across module boundaries. Security-sensitive paths should also receive human review rather than relying only on generated code. The implementation therefore follows the documented rule that large refactors require scoped planning, tests, review, and incremental verification. This workflow preserves traceability and supports rollback when a step causes a regression. It uses Claude Code as an implementation aid while retaining normal software-engineering controls. The team can therefore achieve maintainable code with preserved security guarantees without adding unnecessary complexity."
+  },
+  {
+    "number": 5,
+    "question": "A support platform handles millions of simple language detections and a smaller set of difficult policy investigations. The team wants to control cost without reducing measured quality on complex cases. Which model strategy is most appropriate?",
+    "options": [
+      "Use a faster lower-cost tier for cases that pass task-specific quality gates. Route difficult cases to a more capable tier when evaluation evidence supports escalation.",
+      "Route every request to the most capable model tier. Give simple and complex tasks the same latency, cost, and reasoning configuration. Simple requests would receive the same premium capacity.",
+      "Alternate model tiers randomly across requests. Depend on average spending to remain stable even when individual tasks receive unsuitable capability. Model assignment would change without considering task difficulty.",
+      "Use the least expensive model tier for every request. Increase max_tokens whenever task evaluations fall below the required release threshold. Output length would become the main recovery adjustment."
+    ],
+    "correctAnswers": [
+      "Use a faster lower-cost tier for cases that pass task-specific quality gates. Route difficult cases to a more capable tier when evaluation evidence supports escalation."
+    ],
+    "explanation": "Different workloads can require different levels of capability. Task-specific evaluations can identify which cases meet quality requirements on a faster lower-cost tier. This directly supports matching each workload to the required capability, latency, and cost. A routing rule can send uncertain or complex investigations to a more capable model. The team should measure latency and cost for both paths. This is consistent with the documented rule that model selection should follow task requirements rather than applying one model everywhere. This strategy protects quality where it matters while avoiding unnecessary expense on simple work. It also creates evidence that can be reviewed as models change. In production, this supports efficient quality at the required service level and gives the team a clearer operating model. via - https://www.anthropic.com/engineering/building-effective-agents"
+  },
+  {
+    "number": 6,
+    "question": "A research agent loads large search results into its main conversation and becomes less reliable after several steps. The final answer needs only concise findings from each source, not every raw page. Which context strategy is most appropriate?",
+    "options": [
+      "Delegate source analysis to isolated subagents and return compact findings to the parent. Prune raw results after they are no longer needed for synthesis.",
+      "Store all retrieved pages in the system prompt. Assume system instructions do not count toward the model's total context-window usage. Retrieved pages would be treated as durable instructions.",
+      "Keep every raw tool result in the main conversation. Assume removing any earlier text always reduces the model's ability to answer accurately.",
+      "Add a separate user message for each raw result. Assume splitting content across turns prevents that information from consuming context-window capacity. The same raw data would still occupy the context window."
+    ],
+    "correctAnswers": [
+      "Delegate source analysis to isolated subagents and return compact findings to the parent. Prune raw results after they are no longer needed for synthesis."
+    ],
+    "explanation": "Subagents can process focused material in separate contexts and return only the information needed by the main task. This prevents large source pages from dominating the coordinator's window. The result aligns with keeping active context focused on information needed for the current task. Pruning obsolete tool results removes content that no longer contributes to the next decision. Important conclusions can be retained in compact summaries. The implementation therefore follows the documented rule that pruning, compaction, and isolated subagents reduce context bloat and drift. The strategy preserves task continuity while controlling context growth. It also reduces drift caused by unrelated details from earlier searches. The team can therefore achieve more reliable reasoning within the available token budget without adding unnecessary complexity."
+  },
+  {
+    "number": 7,
+    "question": "A retail team says its product assistant should recommend suitable items and remain responsive during seasonal traffic. The statement is too vague to support architecture or acceptance testing. Which TWO clarifications should the developer obtain first?",
+    "options": [
+      "Specify target latency and expected request volume for the service. Define an availability requirement that can be tested under realistic production conditions.",
+      "Define the expected inputs and recommendation output. Set separate measurable quality criteria that describe how the product should behave for representative user cases.",
+      "Combine quality and operational performance into one general success score. Do not define separate thresholds for accuracy, latency, or service availability. One blended metric would determine the release decision alone.",
+      "Ask Claude to create its own acceptance criteria after deployment. Treat patterns in early user traffic as the authoritative definition of product success.",
+      "Choose a model name before documenting requirements. Infer the application's functional behavior, latency target, and operating constraints directly from the selected capability tier before implementation planning begins."
+    ],
+    "correctAnswers": [
+      "Define the expected inputs and recommendation output. Set separate measurable quality criteria that describe how the product should behave for representative user cases.",
+      "Specify target latency and expected request volume for the service. Define an availability requirement that can be tested under realistic production conditions."
+    ],
+    "explanation": "Functional requirements must explain what the assistant receives and what it must produce. Measurable quality criteria turn the recommendation goal into testable behavior. The result aligns with turning a vague business statement into testable acceptance criteria. These details let the team design evaluation cases and determine whether the feature meets the business need. They also prevent architecture choices from substituting for product requirements. The implementation therefore follows the documented rule that functional and nonfunctional requirements must be explicit before architecture decisions. Clarifying the output contract first supports later model and prompt decisions. The implementation can then be judged against an agreed target. The team can therefore achieve measurable validation and better implementation choices without adding unnecessary complexity. via - https://platform.claude.com/docs/en/test-and-evaluate/develop-tests Latency, volume, and availability are operational constraints that shape infrastructure design. They cannot be derived reliably from the phrase seasonal traffic. This directly supports turning a vague business statement into testable acceptance criteria. Explicit thresholds support capacity planning and production acceptance tests. The team can evaluate whether the chosen integration meets realistic peak conditions. This is consistent with the documented rule that functional and nonfunctional requirements must be explicit before architecture decisions. Together with the functional clarification, these constraints create a complete starting point. They separate what the assistant does from how reliably the service must operate. In production, this supports measurable validation and better implementation choices and gives the team a clearer operating model."
+  },
+  {
+    "number": 8,
+    "question": "A team is replacing a prototype document classifier with a production implementation. It must preserve current behavior, support rollback, and provide evidence before all users are migrated. Which lifecycle plan is most appropriate? Rewrite prompts and application code during the same migration. Do not record which individual change produced each observed improvement or regression. The migration record would not isolate either change.",
+    "options": [
+      "Rewrite prompts and application code during the same migration. Do not record which individual change produced each observed improvement or regression. The migration record would not isolate either change.",
+      "Establish a baseline evaluation and version the candidate implementation. Release to a limited cohort, monitor results, and retain a tested rollback path.",
+      "Keep the old and new systems running permanently. Send every document to both implementations even after the replacement has been formally accepted.",
+      "Replace the prototype in one production deployment. Use customer complaints as the primary way to discover compatibility or quality problems afterward. The entire user population would receive the replacement immediately."
+    ],
+    "correctAnswers": [
+      "Establish a baseline evaluation and version the candidate implementation. Release to a limited cohort, monitor results, and retain a tested rollback path."
+    ],
+    "explanation": "A baseline evaluation establishes the behavior that the production implementation must preserve or improve. Versioning makes the candidate release reproducible. This directly supports introducing production changes with reproducibility and rollback. A limited deployment provides real operational evidence without exposing every user immediately. Monitoring and rollback contain the impact of an unexpected regression. This is consistent with the documented rule that production systems need versioned artifacts, staged validation, and controlled release practices. This sequence supports controlled implementation and change management. It also gives reviewers clear evidence for expanding the release. In production, this supports safer deployment and traceable behavior and gives the team a clearer operating model."
+  },
+  {
+    "number": 9,
+    "question": "A team modifies a customer-support system prompt directly in production whenever an operator reports a bad response. The team cannot reproduce earlier behavior or determine whether later failures came from the prompt change. Which configuration practice should it adopt? Keep one editable prompt in the production console. Allow operators to change application behavior immediately without creating a version or review record. Copy the newest prompt into every service manually. Use local file timestamps as the only record of which prompt version each instance received.",
+    "options": [
+      "Keep one editable prompt in the production console. Allow operators to change application behavior immediately without creating a version or review record.",
+      "Copy the newest prompt into every service manually. Use local file timestamps as the only record of which prompt version each instance received.",
+      "Store versioned prompt definitions in source control and link each release to evaluation evidence. Retain a tested rollback path to the previous approved version.",
+      "Change the model together with the prompt and output parser after every complaint. Treat the combined release as one indivisible production configuration."
+    ],
+    "correctAnswers": [
+      "Store versioned prompt definitions in source control and link each release to evaluation evidence. Retain a tested rollback path to the previous approved version."
+    ],
+    "explanation": "A versioned prompt creates a reproducible configuration artifact. Reviewers can see exactly which instructions were active for a given release. That behavior directly addresses making prompt changes reproducible and testable. Linking the version to evaluation results provides evidence that the change improved the intended behavior without causing known regressions. A rollback path limits the impact of a bad release. The design keeps control in the correct layer by recognizing that prompts should be versioned, evaluated, and promoted through controlled release steps. This practice makes prompt changes part of normal software change management. It also supports incident diagnosis because behavior can be traced to an approved version. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 10,
+    "question": "A small application needs a predictable two-step process: extract fields from an invoice, then validate the result against fixed business rules. The team is considering a large agent framework with persistent memory and dynamic routing. Which design is most appropriate?",
+    "options": [
+      "Implement the known sequence as a simple workflow with explicit validation. Add an agent framework later only when requirements genuinely need dynamic orchestration.",
+      "Adopt the largest available agent framework immediately. Assume persistent memory and dynamic routing always improve reliability for a fixed multi-step task. The framework would add state and routing to the fixed sequence.",
+      "Combine extraction and validation in one unconstrained prompt. Avoid a separate deterministic rule check because it adds engineering work. The model would perform both responsibilities without a code-level gate.",
+      "Use an autonomous agent with every application tool enabled. Let Claude decide whether extraction and deterministic validation are necessary for each invoice."
+    ],
+    "correctAnswers": [
+      "Implement the known sequence as a simple workflow with explicit validation. Add an agent framework later only when requirements genuinely need dynamic orchestration."
+    ],
+    "explanation": "The required sequence is already known, so an explicit workflow represents the process directly. Claude can perform extraction, after which deterministic code validates the result against the fixed rules. The result aligns with a repeatable process with controlled execution order. A simple design reduces hidden state and makes failures easier to trace. The team can test each stage independently and define a clear response when validation fails. The implementation therefore follows the documented rule that workflows fit known steps while agents fit open-ended paths. Framework abstractions should solve a demonstrated orchestration problem rather than create one. The team can introduce richer agent behavior later if tasks require dynamic tool selection, branching, or durable memory. The team can therefore achieve auditability, predictable recovery, and consistent execution without adding unnecessary complexity."
+  },
+  {
+    "number": 11,
+    "question": "A customer-service agent must remember a user's approved preferences across sessions, but it should not reload complete historical conversations into every request. The stored state must remain scoped to the correct user. Which memory pattern best fits?",
+    "options": [
+      "Store concise approved preferences in an external user-scoped record. Retrieve only the fields that are relevant to the current task before building the request.",
+      "Append every prior conversation and tool result to each new request. Let Claude reconstruct user preferences from the complete history without an external store.",
+      "Use one shared memory document for every customer. Rely on common preferences to help the model generalize across unrelated users. Every user would read from the same stored preferences.",
+      "Ask Claude to recall the user's preferences from training data after the session ends. Assume model memory persists automatically across independent API calls."
+    ],
+    "correctAnswers": [
+      "Store concise approved preferences in an external user-scoped record. Retrieve only the fields that are relevant to the current task before building the request."
+    ],
+    "explanation": "External storage can persist selected state without carrying an entire conversation forward. A user-scoped key preserves the boundary between customers. The result aligns with retaining approved preferences across sessions without replaying complete history. Retrieving only relevant preference fields controls token usage and reduces unrelated context. The application can also update or delete the record through normal data governance. The implementation therefore follows the documented rule that persistent memory should store selected durable facts outside the active conversation. This pattern separates durable memory from the model's working context. It supports continuity while limiting privacy exposure and context growth. The team can therefore achieve personalized behavior with lower context cost without adding unnecessary complexity."
+  },
+  {
+    "number": 12,
+    "question": "A developer uses the official TypeScript SDK and expects streaming to return one completed JSON body immediately. The application instead receives an asynchronous sequence of events. Which interpretation is correct? Treat the behavior as an SDK malfunction. Assume every REST wrapper must return one complete body before application code can inspect any generated content.",
+    "options": [
+      "Treat the behavior as an SDK malfunction. Assume every REST wrapper must return one complete body before application code can inspect any generated content.",
+      "Consume the asynchronous event sequence exposed by streaming. Assemble the incremental content into one complete response while preserving block boundaries and completion metadata.",
+      "Treat each streaming event as a separate billable Messages request. Cancel the connection after the first text delta to avoid repeated charges.",
+      "Assume the API uses a persistent database protocol rather than HTTP. Poll a workspace table separately for every token generated by Claude."
+    ],
+    "correctAnswers": [
+      "Consume the asynchronous event sequence exposed by streaming. Assemble the incremental content into one complete response while preserving block boundaries and completion metadata."
+    ],
+    "explanation": "Streaming intentionally delivers events as generation progresses. The SDK exposes those events through an asynchronous interface so the application can react before completion. This directly supports responsive streaming while preserving one coherent assistant response. The client can render deltas while accumulating text and structured blocks. It should still inspect the final message and stop reason when the stream ends. This is consistent with the documented rule that stream events are incremental parts of a single logical message. This behavior is a normal transport pattern rather than an SDK defect. It supports responsive interfaces without creating additional model requests. In production, this supports consistent persistence and reliable recovery when a stream ends or reconnects and gives the team a clearer operating model."
+  },
+  {
+    "number": 13,
+    "question": "A service receives the following API response during a traffic spike. The request is valid, and the same operation succeeds later without code changes. Which recovery strategy is most appropriate? { \"type\": \"error\", \"error\": {\"type\": \"rate_limit_error\"}, \"request_id\": \"req_72K\" } Change the request schema after each failure. Present every retry as a different operation so the client can bypass the service limit. Treat the rate-limit response as a permanent validation failure. Require a developer to rewrite the prompt before the client attempts the request again. Retry the failed request immediately in a tight loop. Continue sending calls because the rate limit should disappear as soon as another request arrives.",
+    "options": [
+      "Change the request schema after each failure. Present every retry as a different operation so the client can bypass the service limit.",
+      "Treat the rate-limit response as a permanent validation failure. Require a developer to rewrite the prompt before the client attempts the request again.",
+      "Retry the failed request immediately in a tight loop. Continue sending calls because the rate limit should disappear as soon as another request arrives.",
+      "Apply bounded retries with exponential backoff and jitter. Record the request identifier and stop retrying when the configured attempt or time limit is reached. The client would preserve the original request parameters."
+    ],
+    "correctAnswers": [
+      "Apply bounded retries with exponential backoff and jitter. Record the request identifier and stop retrying when the configured attempt or time limit is reached. The client would preserve the original request parameters."
+    ],
+    "explanation": "A rate limit error is usually transient rather than a defect in the request schema. Bounded backoff gives capacity time to recover without creating a retry storm. That behavior directly addresses recovering safely from a temporary service failure. Jitter reduces synchronized retries across many workers. Logging the request identifier supports investigation if the condition persists. The design keeps control in the correct layer by recognizing that retriable errors need bounded backoff while terminal errors require correction. This strategy balances recovery with operational safety. A final failure can be surfaced after the configured attempt or time budget is exhausted. This also makes the solution easier to verify and maintain in production. via - https://platform.claude.com/docs/en/api/errors"
+  },
+  {
+    "number": 14,
+    "question": "A fraud-analysis prompt performs well on ordinary cases but misses complex chains of evidence. The team has already clarified the prompt and measured the remaining gap. Which next step is most appropriate? Increase temperature until Claude produces more varied fraud theories. Accept whichever response contains the largest number of details. Response variety would become the primary selection signal.",
+    "options": [
+      "Increase temperature until Claude produces more varied fraud theories. Accept whichever response contains the largest number of details. Response variety would become the primary selection signal.",
+      "Run the same standard request several times and select the longest response. Treat response length as sufficient evidence of better reasoning quality.",
+      "Enable a suitable thinking mode for the difficult task. Compare measured quality gains against additional latency and token cost through representative evaluations.",
+      "Add the complete production database to every request. Let the model search that context without a defined retrieval or data-minimization process. Every request would carry the full operational dataset."
+    ],
+    "correctAnswers": [
+      "Enable a suitable thinking mode for the difficult task. Compare measured quality gains against additional latency and token cost through representative evaluations."
+    ],
+    "explanation": "Thinking modes are intended for tasks that benefit from additional reasoning. The team has already established a measured quality gap after prompt improvement. That behavior directly addresses improving difficult reasoning only when evaluations justify the extra resources. Evaluations should determine whether the extra reasoning improves the target cases enough to justify its latency and token cost. The configuration should be chosen from evidence rather than assumption. The design keeps control in the correct layer by recognizing that thinking modes trade additional tokens and latency for reasoning capability. This step addresses the actual failure mode while preserving operational visibility. Easier cases can remain on a lower-cost path if they already meet requirements. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 15,
+    "question": "A product team needs long-running agents with isolated sandboxes and asynchronous sessions, but it does not want to operate container scheduling or session infrastructure. The application will interact through a hosted REST interface. Which construction approach best fits?",
+    "options": [
+      "Use Claude Managed Agents for the workload. Let Anthropic operate the isolated sandbox and session infrastructure while the application invokes the hosted service.",
+      "Use one Messages API call without tools. Depend on a long prompt to simulate an isolated sandbox and preserve state across later sessions.",
+      "Build a custom agent loop on developer laptops. Treat those local processes as the production runtime for every customer session. Customer sessions would depend on those developer-hosted processes.",
+      "Run the Claude Agent SDK directly inside each browser. Assume client-side execution removes the need for a server and automatically protects credentials."
+    ],
+    "correctAnswers": [
+      "Use Claude Managed Agents for the workload. Let Anthropic operate the isolated sandbox and session infrastructure while the application invokes the hosted service."
+    ],
+    "explanation": "Managed Agents are designed for hosted agent execution with Anthropic-operated infrastructure. The application can start and observe sessions through a REST interface. This directly supports running long-lived agents without operating the underlying execution infrastructure. Isolated sandboxes and long-running asynchronous work are provided without the team managing the underlying runtime. The service still defines tools, behavior, and access controls. This is consistent with the documented rule that managed agent services provide isolated environments and asynchronous session management. This approach directly matches the operational constraint. It reduces platform work while preserving an application integration boundary. In production, this supports scalable agent execution with lower operational burden and gives the team a clearer operating model."
+  },
+  {
+    "number": 16,
+    "question": "A compliance system has mandatory deterministic checks, followed by an open-ended investigation that may require different evidence tools for each case. The final decision must still pass an approval boundary. Which TWO architecture choices best fit?",
+    "options": [
+      "Let a bounded agent choose investigation tools inside the approved stage. Return its findings to the controlled workflow before the next required gate.",
+      "Replace investigation with a fixed script that queries every evidence source in the same order. Use that sequence for every case. The script would not adapt its evidence search to the case.",
+      "Implement mandatory checks and approval as deterministic workflow stages. Prevent the model from skipping those controls during execution. Required controls would remain outside the agent's discretion.",
+      "Run every stage as unrelated parallel agents. Accept the first completed decision without waiting for mandatory checks or approval. The fastest branch would determine the final decision.",
+      "Give one autonomous agent unrestricted control over checks and investigation. Let the same agent approve its decision and execute the final action."
+    ],
+    "correctAnswers": [
+      "Implement mandatory checks and approval as deterministic workflow stages. Prevent the model from skipping those controls during execution. Required controls would remain outside the agent's discretion.",
+      "Let a bounded agent choose investigation tools inside the approved stage. Return its findings to the controlled workflow before the next required gate."
+    ],
+    "explanation": "Mandatory checks and approvals have known order and control requirements. Encoding them as workflow stages prevents the model from bypassing those boundaries. This directly supports combining mandatory controls with flexible investigation. The application can record each result and stop when a required condition fails. This creates a repeatable audit trail for every case. This is consistent with the documented rule that fixed checks belong in a workflow while open-ended evidence gathering can use an agent. Deterministic stages are appropriate where compliance values control over flexibility. They also provide clear recovery points after an interruption. In production, this supports compliance together with adaptable analysis and gives the team a clearer operating model. The investigation path is uncertain because different cases require different evidence. A bounded agent can select from an approved tool set within that limited stage. That behavior directly addresses combining mandatory controls with flexible investigation. The agent returns findings rather than making or executing the final decision. The surrounding workflow retains authority over approval and subsequent action. The design keeps control in the correct layer by recognizing that fixed checks belong in a workflow while open-ended evidence gathering can use an agent. This hybrid architecture places autonomy only where it adds value. It preserves flexibility without weakening mandatory controls. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 17,
+    "question": "A Python web service uses an asynchronous request handler but calls Claude through a synchronous SDK client. Under load, each model request blocks the event loop and delays unrelated users. Which implementation change best addresses the problem?",
+    "options": [
+      "Create a new synchronous client for every incoming request. Assume separate client objects prevent one network call from blocking the shared event loop.",
+      "Use the asynchronous Anthropic client and await the model call. Preserve the service's normal timeout, cancellation, and error-handling behavior around the operation. Other handlers could continue while the request waits.",
+      "Place the synchronous SDK call inside a polling loop. Expect frequent completion checks to let other coroutines run while the call blocks.",
+      "Keep the synchronous client inside the asynchronous handler and increase max_tokens. Let each blocked request perform more generation before releasing the event loop."
+    ],
+    "correctAnswers": [
+      "Use the asynchronous Anthropic client and await the model call. Preserve the service's normal timeout, cancellation, and error-handling behavior around the operation. Other handlers could continue while the request waits."
+    ],
+    "explanation": "An asynchronous client integrates the network operation with the service's event loop. Awaiting the call allows the runtime to schedule other requests while Claude is processing the current one. That behavior directly addresses preventing synchronous model calls from blocking an asynchronous server. The handler should still preserve production controls such as timeouts, cancellation, retries where appropriate, and error translation. Asynchronous execution changes concurrency behavior but does not remove operational responsibilities. The design keeps control in the correct layer by recognizing that async request handlers should use an asynchronous client or move blocking work off the event loop. This approach matches the surrounding application architecture and avoids unnecessary thread or process workarounds. It improves responsiveness without changing the model task itself. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 18,
+    "question": "A team installs a shared Claude Code plugin that depends on two other plugins, and an unreviewed dependency update changes behavior across all repositories. The team needs reproducible installations and controlled upgrades. Which practice best addresses the problem? Allow every plugin dependency to track its newest available release. Accept updates without compatibility testing because newer versions should preserve existing behavior. Remove dependency metadata from the plugin. Let each developer install whatever versions are already available on the local machine. Installed versions could therefore differ across developer machines.",
+    "options": [
+      "Allow every plugin dependency to track its newest available release. Accept updates without compatibility testing because newer versions should preserve existing behavior.",
+      "Remove dependency metadata from the plugin. Let each developer install whatever versions are already available on the local machine. Installed versions could therefore differ across developer machines.",
+      "Declare compatible dependency version constraints and test the resolved plugin set. Promote only approved updates through the team's normal change-control process. Every promoted plugin build would use the tested dependency set.",
+      "Copy dependency source code into every repository. Let each team modify its private copy whenever the shared dependency behaves differently. Each repository would maintain its own dependency branch."
+    ],
+    "correctAnswers": [
+      "Declare compatible dependency version constraints and test the resolved plugin set. Promote only approved updates through the team's normal change-control process. Every promoted plugin build would use the tested dependency set."
+    ],
+    "explanation": "Version constraints define which dependency releases are acceptable for the plugin. They prevent an unrelated update from silently changing every installation. The result aligns with keeping shared plugin behavior reproducible across the team. Testing the resolved set verifies that the plugin and its dependencies still work together. Change control then makes the approved upgrade deliberate and traceable. The implementation therefore follows the documented rule that plugin dependencies and versions must be reviewed and controlled like other configuration. This approach supports repeatable environments across repositories. It also leaves a clear path for adopting later fixes after compatibility is verified. The team can therefore achieve predictable developer environments and safer dependency updates without adding unnecessary complexity. via - https://code.claude.com/docs/en/plugin-dependencies"
+  },
+  {
+    "number": 19,
+    "question": "A team tested a workflow in claude.ai using project instructions, then moved the same user prompt into a backend Messages API call. The API output no longer follows the project-specific rules. What should the developer do? Repeat the user prompt several times through the API. Expect the hidden project instructions to become active after enough model calls. Repeated calls would contain the same incomplete request.",
+    "options": [
+      "Repeat the user prompt several times through the API. Expect the hidden project instructions to become active after enough model calls. Repeated calls would contain the same incomplete request.",
+      "Send the required instructions explicitly in the API request. Version those instructions with the backend application so behavior remains traceable across releases.",
+      "Assume claude.ai project instructions are attached to the user's identity and will synchronize automatically. Send no explicit project instruction or supporting configuration from the backend for any production request.",
+      "Add the claude.ai project URL to the API user message. Expect Claude to retrieve the project's private configuration from that address."
+    ],
+    "correctAnswers": [
+      "Send the required instructions explicitly in the API request. Version those instructions with the backend application so behavior remains traceable across releases."
+    ],
+    "explanation": "Instructions configured in one interface are not automatically part of a separate API request. The backend must include the behavior it depends on. This directly supports preserving required instructions when moving between Claude interfaces. Using the system field or another documented instruction mechanism makes the contract explicit. Versioning the prompt with the application supports review and rollback. This is consistent with the documented rule that project instructions in one interface are not automatically included in API requests. This approach makes the API behavior reproducible across environments. It avoids a hidden dependency on an unrelated user interface. In production, this supports consistent behavior across development and production environments and gives the team a clearer operating model."
+  },
+  {
+    "number": 20,
+    "question": "A Python web service calls Claude from a server route, but its parser assumes the first response block is always text. The service must support responses that can contain text and tool-use blocks without crashing. Which change should the developer make? response = client.messages.create(**request) return response.content[0].text Disable all tool definitions whenever a request may return text. This forces the response into one block that the application can read through a text property.",
+    "options": [
+      "response = client.messages.create(**request)",
+      "Disable all tool definitions whenever a request may return text. This forces the response into one block that the application can read through a text property.",
+      "Iterate through response.content and branch on each block type. Route text blocks and tool-use blocks to the appropriate application handler. The application would preserve the meaning of every returned block.",
+      "Read response.content[-1].text as the answer. Assume Claude always places final natural-language text in the last content block regardless of other block types.",
+      "Convert the entire response object into a string and return it directly. This exposes every content block without distinguishing how each block should be handled."
+    ],
+    "correctAnswers": [
+      "Iterate through response.content and branch on each block type. Route text blocks and tool-use blocks to the appropriate application handler. The application would preserve the meaning of every returned block."
+    ],
+    "explanation": "A Messages response can contain multiple typed content blocks. Iterating over the collection lets the application handle each documented block safely. The result aligns with handling every response block according to its actual type. Text blocks can be appended to the user-facing answer while tool-use blocks enter the tool execution path. The parser can also reject or log unknown types explicitly. The implementation therefore follows the documented rule that Messages API responses can contain multiple structured content blocks. This implementation preserves the response contract as features evolve. It avoids relying on an array position that has no universal semantic meaning. The team can therefore achieve correct parsing across text, tool use, and other supported content without adding unnecessary complexity."
+  },
+  {
+    "number": 21,
+    "question": "A TypeScript service uses the SDK's streaming helper and receives events through an async iterator. A reviewer claims the code must switch to WebSockets because ordinary HTTP cannot deliver incremental output. Which response is correct? Require WebSockets for every Claude streaming request. Assume an HTTP response cannot remain open while the model generates content. The client would reject ordinary HTTP streaming support. Limit incremental events to local Claude Code sessions. Assume backend applications cannot receive streamed content from the Messages API. The backend would wait for a non-streamed final response.",
+    "options": [
+      "Require WebSockets for every Claude streaming request. Assume an HTTP response cannot remain open while the model generates content. The client would reject ordinary HTTP streaming support.",
+      "Limit incremental events to local Claude Code sessions. Assume backend applications cannot receive streamed content from the Messages API. The backend would wait for a non-streamed final response.",
+      "Use streaming Messages to receive incremental server-sent events over one HTTP response. Consume those events asynchronously through the SDK. The backend would process events as they arrive.",
+      "Assume the SDK creates one REST request for every generated token. Treat the asynchronous iterator only as a convenience for handling many ordinary calls."
+    ],
+    "correctAnswers": [
+      "Use streaming Messages to receive incremental server-sent events over one HTTP response. Consume those events asynchronously through the SDK. The backend would process events as they arrive."
+    ],
+    "explanation": "The Messages API supports incremental delivery through server-sent events. A long-lived HTTP response can carry those events as generation proceeds. This directly supports responsive streaming while preserving one coherent assistant response. The SDK wraps the event stream in an asynchronous interface that is convenient for TypeScript applications. The client can process deltas without managing a WebSocket connection. This is consistent with the documented rule that stream events are incremental parts of a single logical message. This explanation matches the documented transport behavior. The service can keep its current architecture while handling events and completion correctly. In production, this supports consistent persistence and reliable recovery when a stream ends or reconnects and gives the team a clearer operating model."
+  },
+  {
+    "number": 22,
+    "question": "A TypeScript deployment agent uses the Claude Agent SDK to inspect a release, run tests, and request a production rollout. Production changes must receive an external approval while ordinary read-only investigation should continue automatically. Which construction approach best fits this requirement?",
+    "options": [
+      "Start a second unrestricted agent whenever deployment is requested. Keep the original agent read-only while the new session performs the production change.",
+      "Grant every SDK tool when the session begins. Add a final prompt asking Claude to confirm that an approver probably intended the production rollout.",
+      "Remove the deployment tool and ask Claude to print a shell command. Let any available application component execute that text automatically. Another component would execute unstructured model-generated text.",
+      "Use a permission callback or hook that automatically allows read-only tools. Pause the deployment tool until the external approval service returns an authorized decision."
+    ],
+    "correctAnswers": [
+      "Use a permission callback or hook that automatically allows read-only tools. Pause the deployment tool until the external approval service returns an authorized decision."
+    ],
+    "explanation": "The Agent SDK permission layer can distinguish low-risk investigation from a sensitive production action. Read-only tools remain available while the deployment request is intercepted for an external decision. That behavior directly addresses allowing inspection and testing while gating production changes. A callback or hook can examine the tool name, arguments, identity, and approval result before execution. This creates a deterministic control outside the model's own reasoning. The design keeps control in the correct layer by recognizing that agent permissions and approval callbacks must match the risk of each tool. The design preserves agent productivity without granting unnecessary standing authority. An approved action can proceed with an audit trail, while a denied or expired request remains blocked. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 23,
+    "question": "A claims prompt performs well on the examples used during development but fails when evidence contains multiple dates and conflicting notes. The team wants to improve the prompt without guessing which wording will help. Which approach should it use? Add persuasive adjectives to the system prompt and release immediately. Assume stronger wording produces more reliable reasoning without further evaluation. The updated prompt would receive no pre-release comparison. Keep the prompt unchanged and repeat each failed request. Accept the first response that happens to match the expected answer. Repeated sampling would replace deliberate prompt improvement.",
+    "options": [
+      "Add persuasive adjectives to the system prompt and release immediately. Assume stronger wording produces more reliable reasoning without further evaluation. The updated prompt would receive no pre-release comparison.",
+      "Keep the prompt unchanged and repeat each failed request. Accept the first response that happens to match the expected answer. Repeated sampling would replace deliberate prompt improvement.",
+      "Collect representative failures and define the desired decisions. Revise instructions or examples, then rerun a held-out evaluation after each controlled change. Each revision would be measured against unchanged test cases.",
+      "Replace all existing examples with the single most difficult claim. Make Claude focus exclusively on the worst observed case. Performance on ordinary claims would remain unmeasured."
+    ],
+    "correctAnswers": [
+      "Collect representative failures and define the desired decisions. Revise instructions or examples, then rerun a held-out evaluation after each controlled change. Each revision would be measured against unchanged test cases."
+    ],
+    "explanation": "Representative failures show where the current instructions or examples are insufficient. The team can revise the prompt against specific observed behavior. This directly supports testing prompt behavior against representative and difficult cases. A held-out evaluation checks whether the change generalizes beyond the cases used for editing. Testing one change at a time preserves causal understanding. This is consistent with the documented rule that evaluation sets should cover normal inputs, edge cases, and known failure modes. This process turns prompt refinement into an evidence-based engineering activity. It reduces the chance of fixing one example while harming ordinary claims. In production, this supports evidence-based prompt refinement and gives the team a clearer operating model."
+  },
+  {
+    "number": 24,
+    "question": "A booking assistant brief says it should reserve appointments quickly and work reliably. The engineering team needs acceptance criteria that separate product behavior from operational quality. Which TWO criteria are most useful? Require the service to improve over time. Do not define how improvement will be measured or which result authorizes a release. No objective release threshold would be available.",
+    "options": [
+      "Require the service to improve over time. Do not define how improvement will be measured or which result authorizes a release. No objective release threshold would be available.",
+      "Require the assistant to return an available appointment identifier and confirmation details whenever a valid booking request succeeds. The requirement identifies a verifiable functional outcome.",
+      "Require the team to use the newest model available when implementation starts. Do not measure whether that model meets the actual workload requirements.",
+      "Require the assistant to feel intelligent and provide a modern conversational experience. Use that general impression as the feature's main acceptance requirement.",
+      "Require ninety-five percent of valid booking requests to finish within the approved latency threshold under the expected peak load. The requirement defines a measurable performance threshold."
+    ],
+    "correctAnswers": [
+      "Require the assistant to return an available appointment identifier and confirmation details whenever a valid booking request succeeds. The requirement identifies a verifiable functional outcome.",
+      "Require ninety-five percent of valid booking requests to finish within the approved latency threshold under the expected peak load. The requirement defines a measurable performance threshold."
+    ],
+    "explanation": "The booking output describes a specific function the assistant must perform. It can be tested with valid requests and known appointment inventory. That behavior directly addresses turning a vague business statement into testable acceptance criteria. Requiring an identifier and confirmation details creates an observable contract. The team can detect missing or malformed reservations before release. The design keeps control in the correct layer by recognizing that functional and nonfunctional requirements must be explicit before architecture decisions. This criterion translates the product goal into measurable behavior. It also guides schema design and downstream integration. This also makes the solution easier to verify and maintain in production. Latency under stated load is a measurable nonfunctional requirement. It tells the team what operational performance the production architecture must sustain. The result aligns with turning a vague business statement into testable acceptance criteria. A percentile threshold avoids relying on an unrepresentative average. Peak-load conditions make the test relevant to the stated reliability concern. The implementation therefore follows the documented rule that functional and nonfunctional requirements must be explicit before architecture decisions. Together with the functional criterion, this provides balanced acceptance coverage. The design can be assessed for both correctness and service performance. The team can therefore achieve measurable validation and better implementation choices without adding unnecessary complexity."
+  },
+  {
+    "number": 25,
+    "question": "A team is building a repository maintenance agent in Python. It wants built-in file and command tools, session support, permissions, and an existing agent loop instead of implementing each capability itself. Which approach best fits? async def maintain_repository(prompt: str): # Select the most suitable Claude development interface here. pass",
+    "options": [
+      "Use the Anthropic client SDK but implement a custom agent loop inside the function. Build filesystem access and command execution together with permissions and session storage.",
+      "Call the Messages API once with the repository path as plain text. Expect Claude to edit local files even though the application provides no tools.",
+      "Run several ordinary Messages API requests in parallel. Treat whichever text response arrives first as the completed repository maintenance result. No response would have authority to inspect the repository.",
+      "Use the Claude Agent SDK with an explicit allowed-tool set. Consume its asynchronous message stream while the maintenance agent inspects and updates the repository."
+    ],
+    "correctAnswers": [
+      "Use the Claude Agent SDK with an explicit allowed-tool set. Consume its asynchronous message stream while the maintenance agent inspects and updates the repository."
+    ],
+    "explanation": "The Agent SDK provides the agent loop and built-in development tools needed for repository work. Python code can configure allowed tools and consume messages asynchronously. That behavior directly addresses building an agent with tools, sessions, permissions, and an execution loop. Permissions and sessions are part of the SDK's supported control model. The team can focus on task-specific behavior instead of rebuilding the entire harness. The design keeps control in the correct layer by recognizing that the Claude Agent SDK provides the agentic harness and built-in capabilities. This choice matches the stated desire for an existing agent runtime. It also leaves tool authority visible in configuration and review. This also makes the solution easier to verify and maintain in production. via - https://code.claude.com/docs/en/agent-sdk/agent-loop"
+  },
+  {
+    "number": 26,
+    "question": "A development organization wants two reusable capabilities. One is a documented code-review procedure that should guide Claude consistently across supported interfaces. The other is live access to an internal issue system used by several Claude applications. Which TWO approaches should the organization use?",
+    "options": [
+      "Package the stable code-review procedure as a Skill. Reuse the same tested instructions across Claude environments that support the packaged capability. Teams could invoke the reviewed procedure as a reusable capability.",
+      "Build both capabilities as custom tools inside every application. Let each team maintain its own independent schemas and execution code. Every application would maintain duplicate integration code.",
+      "Expose internal issue operations through an MCP server. Let multiple Claude applications discover and invoke the same independently maintained live integration. Several applications could share the same live service connection.",
+      "Store the review procedure in a shared database. Ask Claude to infer how to query that database without an explicit integration contract.",
+      "Place the review procedure and current issue data in one large system prompt. Copy that combined prompt into every application request. Live issue data would be copied into every prompt."
+    ],
+    "correctAnswers": [
+      "Package the stable code-review procedure as a Skill. Reuse the same tested instructions across Claude environments that support the packaged capability. Teams could invoke the reviewed procedure as a reusable capability.",
+      "Expose internal issue operations through an MCP server. Let multiple Claude applications discover and invoke the same independently maintained live integration. Several applications could share the same live service connection."
+    ],
+    "explanation": "A Skill is appropriate for a reusable procedure made from instructions, supporting material, or scripts. It packages the code-review method so teams do not need to rewrite the same guidance in every prompt. That behavior directly addresses packaging reusable instructions and executable integrations in the right form. The procedure can be versioned and tested as one shared capability. Claude loads the Skill when the task matches, which avoids permanently placing all review instructions into every request. The design keeps control in the correct layer by recognizing that Skills guide repeatable procedures while tools and MCP servers provide executable capabilities. This choice separates procedural knowledge from live system access. The organization can improve the review method without changing each application's integration code. This also makes the solution easier to verify and maintain in production. An MCP server is appropriate for reusable access to an external system. It can expose issue operations as discoverable tools behind a maintained client-server contract. The result aligns with packaging reusable instructions and executable integrations in the right form. Several Claude applications can connect to the same server rather than rebuilding the issue integration. Authentication, execution logic, and service-specific changes remain centralized. The implementation therefore follows the documented rule that Skills guide repeatable procedures while tools and MCP servers provide executable capabilities. This choice provides current data and actions instead of static copied content. It also allows the integration to evolve independently from the applications that consume it. The team can therefore achieve consistent reuse across teams and applications without adding unnecessary complexity."
+  },
+  {
+    "number": 27,
+    "question": "A long-running support agent has accumulated old tool outputs, abandoned troubleshooting paths, and details from resolved tickets. Responses are becoming less focused, but the current ticket still needs a few verified facts from earlier turns. What should the developer do?",
+    "options": [
+      "Increase response length and reasoning effort. Expect Claude to overcome context drift even though the request still contains stale and distracting information.",
+      "Keep the full transcript unchanged. Assume removing any earlier tool output or abandoned troubleshooting step always reduces the agent's accuracy. Resolved branches would continue competing with current evidence.",
+      "Move every old message into the system prompt. Assume that higher placement prevents the retained history from consuming context-window capacity. Old operational data would receive instruction-level placement.",
+      "Prune irrelevant tool results and resolved branches from the conversation. Compact the remaining history while preserving verified facts needed for the current ticket."
+    ],
+    "correctAnswers": [
+      "Prune irrelevant tool results and resolved branches from the conversation. Compact the remaining history while preserving verified facts needed for the current ticket."
+    ],
+    "explanation": "Context engineering should preserve information that remains useful while removing material that no longer contributes to the active task. Old outputs and abandoned branches consume tokens and can distract the model. The result aligns with keeping active context focused on information needed for the current task. Compaction or a careful summary can retain verified facts, decisions, and open work without replaying every turn. The developer should confirm that the resulting state still contains the evidence needed for the current ticket. The implementation therefore follows the documented rule that pruning, compaction, and isolated subagents reduce context bloat and drift. This approach reduces context bloat and limits drift while maintaining continuity. It also leaves more capacity for new tool results and the model's response. The team can therefore achieve more reliable reasoning within the available token budget without adding unnecessary complexity."
+  },
+  {
+    "number": 28,
+    "question": "A refund agent can inspect orders and issue payments, but refunds above a threshold can create significant financial loss. The team wants automation for routine cases without giving the agent unlimited authority. Which TWO controls should it implement? Hide refund amounts from operational logs. Prevent reviewers from examining the value or basis of a decision after the tool executes. Operators would retain no monetary audit detail afterward. Ask Claude to promise in its system prompt that it will never issue an unsafe refund. Remove application-level checks from the execution path.",
+    "options": [
+      "Hide refund amounts from operational logs. Prevent reviewers from examining the value or basis of a decision after the tool executes. Operators would retain no monetary audit detail afterward.",
+      "Ask Claude to promise in its system prompt that it will never issue an unsafe refund. Remove application-level checks from the execution path.",
+      "Require explicit human approval before executing a refund that exceeds the automated threshold or triggers a defined risk rule. The executor would pause until the approval decision arrives.",
+      "Limit the refund tool to approved fields and a maximum amount that matches the routine automation policy. Enforce those deterministic boundaries before the executor processes any refund without additional discretion.",
+      "Give the agent one unrestricted payment credential. Allow it to issue every refund directly without waiting for another system or approval decision."
+    ],
+    "correctAnswers": [
+      "Limit the refund tool to approved fields and a maximum amount that matches the routine automation policy. Enforce those deterministic boundaries before the executor processes any refund without additional discretion.",
+      "Require explicit human approval before executing a refund that exceeds the automated threshold or triggers a defined risk rule. The executor would pause until the approval decision arrives."
+    ],
+    "explanation": "A narrowly scoped refund tool enforces the routine policy at the application boundary. Claude cannot exceed the allowed amount simply by generating different arguments. The result aligns with requiring accountable authorization before high-impact actions. Restricting fields also reduces the number of ways the capability can be misused. Validation can reject requests outside the documented contract. The implementation therefore follows the documented rule that human-in-the-loop checkpoints should protect irreversible or financially significant operations. This control applies least privilege to the automated path. It makes safe routine refunds possible without exposing general payment authority. The team can therefore achieve useful automation with clear human control without adding unnecessary complexity. Consequential cases should cross a deterministic human review boundary. Approval can verify the amount, identity, and supporting evidence before payment is released. This directly supports requiring accountable authorization before high-impact actions. The model may prepare the recommendation while the application controls execution. The checkpoint should be recorded for later audit. This is consistent with the documented rule that human-in-the-loop checkpoints should protect irreversible or financially significant operations. Together with the scoped tool, this creates layered protection. Automation remains efficient while high-impact actions receive additional oversight. In production, this supports useful automation with clear human control and gives the team a clearer operating model."
+  },
+  {
+    "number": 29,
+    "question": "A repository needs shared coding instructions, while one developer wants a personal permission override that must never be committed. The team also wants Claude Code to load both settings in the appropriate scope. Which configuration should they use? repository/ .claude/ src/ Put the shared instructions and personal permission override in one committed settings.json file. Give every developer the same access regardless of individual needs. Write both settings into the first prompt of every session. Assume Claude Code does not automatically load repository instruction or configuration files.",
+    "options": [
+      "Put the shared instructions and personal permission override in one committed settings.json file. Give every developer the same access regardless of individual needs.",
+      "Write both settings into the first prompt of every session. Assume Claude Code does not automatically load repository instruction or configuration files.",
+      "Place shared project instructions in the repository's CLAUDE.md file. Keep the developer's personal permission override in settings.local.json and exclude that file from version control.",
+      "Store shared project instructions only in the developer's home directory. Put the personal permission rule into the repository's committed CLAUDE.md file."
+    ],
+    "correctAnswers": [
+      "Place shared project instructions in the repository's CLAUDE.md file. Keep the developer's personal permission override in settings.local.json and exclude that file from version control."
+    ],
+    "explanation": "A project CLAUDE.md file is designed for durable repository guidance that the team can share. It can be reviewed and committed with the codebase. This directly supports separating shared repository behavior from personal local preferences. Local settings provide a separate place for developer-specific configuration that should not be shared. Excluding the local file from version control protects personal permission choices. This is consistent with the documented rule that Claude Code applies configuration according to documented scope and precedence. This separation gives each instruction the correct scope. Team behavior remains consistent without publishing an individual's local access preferences. In production, this supports consistent team behavior without exposing personal overrides and gives the team a clearer operating model. via - https://code.claude.com/docs/en/settings"
+  },
+  {
+    "number": 30,
+    "question": "A document assistant sends a 70,000-token prompt to a model with a fixed context window. The team also wants to reserve enough space for a detailed answer and possible tool results. Which budgeting approach is most appropriate? Estimate only the visible document text. Assume tool definitions and earlier conversation turns are stored outside the model's context window. The estimator would omit those additional inputs entirely. Treat the advertised context window as an output allowance. Ignore the prompt size because input tokens supposedly do not reduce the model's available response capacity.",
+    "options": [
+      "Estimate only the visible document text. Assume tool definitions and earlier conversation turns are stored outside the model's context window. The estimator would omit those additional inputs entirely.",
+      "Treat the advertised context window as an output allowance. Ignore the prompt size because input tokens supposedly do not reduce the model's available response capacity.",
+      "Calculate the complete input size across instructions and conversation history. Include tool definitions and attached documents, then reserve sufficient output capacity before accepting the request. The calculation would occur before network transmission.",
+      "Set max_tokens equal to the full context window. Allow Claude to discard whichever input sections become unnecessary when generation begins. Claude would decide which input sections to discard."
+    ],
+    "correctAnswers": [
+      "Calculate the complete input size across instructions and conversation history. Include tool definitions and attached documents, then reserve sufficient output capacity before accepting the request. The calculation would occur before network transmission."
+    ],
+    "explanation": "The context window is shared by the request content and the generated response. Counting every included component gives the application a realistic input total. The result aligns with reserving enough capacity for both the request and the generated response. Reserving capacity for the answer and expected tool exchanges prevents the request from consuming the full window before generation begins. The budget can be enforced before sending the call. The implementation therefore follows the documented rule that input and output tokens share the same finite context window. This method makes capacity decisions predictable and testable. It also supports deliberate pruning or compaction when the complete request no longer fits. The team can therefore achieve predictable request admission and safer token budgeting without adding unnecessary complexity."
+  },
+  {
+    "number": 31,
+    "question": "A benefits application accepts user-submitted case details and uses Claude to generate a structured recommendation. The result can trigger a downstream workflow, so the application must protect both the model boundary and the business process. Which TWO controls should the developer implement? Trust all submitted text after the user authenticates. Assume a signed-in user cannot provide prompt injection content or malformed field values. Authentication would be treated as content validation.",
+    "options": [
+      "Trust all submitted text after the user authenticates. Assume a signed-in user cannot provide prompt injection content or malformed field values. Authentication would be treated as content validation.",
+      "Validate the structured response and applicable business rules before triggering the workflow. Route failures or uncertain cases into a controlled recovery path.",
+      "Validate and sanitize incoming fields while separating untrusted case content from trusted instructions. Send only the data required for the recommendation after these checks complete successfully at the application boundary.",
+      "Give Claude direct write access to every benefits record. Let the model correct missing data whenever recommendation processing discovers an inconsistency. Recommendation handling would gain broad record-modification authority.",
+      "Execute the downstream workflow whenever Claude uses confident language. Continue even when the response cannot be parsed into the expected structure. Confident prose would become the workflow's authorization signal."
+    ],
+    "correctAnswers": [
+      "Validate and sanitize incoming fields while separating untrusted case content from trusted instructions. Send only the data required for the recommendation after these checks complete successfully at the application boundary.",
+      "Validate the structured response and applicable business rules before triggering the workflow. Route failures or uncertain cases into a controlled recovery path."
+    ],
+    "explanation": "Authentication identifies a user but does not make every submitted value safe. Input validation and clear separation prevent untrusted case text from being treated as trusted application instructions. This directly supports using untrusted case data safely before automated decisions. Sending only necessary fields reduces privacy exposure and limits the material an attacker can manipulate. The application should preserve trusted control logic outside the user-provided content. This is consistent with the documented rule that input sanitization, schema validation, authorization, and review must protect high-impact workflows. This control protects the request boundary before Claude processes the case. It complements, rather than replaces, validation of the model's eventual response. In production, this supports defensible recommendations and controlled downstream actions and gives the team a clearer operating model. A structured response must be checked before it becomes an operational decision. Schema validation confirms shape, while business rules determine whether the recommendation is allowed for the specific case. That behavior directly addresses using untrusted case data safely before automated decisions. A recovery path handles malformed output, unsupported conditions, and low-confidence situations without silently continuing. Human review or a bounded repair attempt can be selected according to risk. The design keeps control in the correct layer by recognizing that input sanitization, schema validation, authorization, and review must protect high-impact workflows. This control protects the downstream workflow from model and integration failures. It prevents confident wording from being mistaken for a valid business authorization. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 32,
+    "question": "A developer has finished debugging one service and now wants to start an unrelated repository task without carrying the previous conversation into the new work. The current session contains many tool results and assumptions that should not influence the next task. Which command choice is most appropriate? Keep the existing session unchanged. Add a user message telling Claude to ignore everything it previously learned about the completed task. Old assumptions would remain available to the model.",
+    "options": [
+      "Keep the existing session unchanged. Add a user message telling Claude to ignore everything it previously learned about the completed task. Old assumptions would remain available to the model.",
+      "Use /clear to remove the current session history before the unrelated task begins. Then provide only the new repository context and instructions required for that work in a clean session.",
+      "Use /compact before starting the unrelated task. Assume summarizing the old conversation guarantees that no earlier assumptions remain active. The summarized history would remain part of the session.",
+      "Use /resume to reopen an older session. Treat any previous context as more useful than beginning with a clean conversation. The reopened session would restore its earlier task context."
+    ],
+    "correctAnswers": [
+      "Use /clear to remove the current session history before the unrelated task begins. Then provide only the new repository context and instructions required for that work in a clean session."
+    ],
+    "explanation": "An unrelated task benefits from a clean conversation rather than a compressed version of old assumptions. The clear command removes the existing session context. This directly supports starting unrelated repository work with a clean conversation state. The developer can then supply only the instructions and files relevant to the new repository. This reduces accidental carryover and unnecessary context cost. This is consistent with the documented rule that clearing removes irrelevant history while compaction preserves context for continuing work. This choice matches the boundary between distinct tasks. It is more reliable than asking the model to disregard information that remains present. In production, this supports focused reasoning for the new task and gives the team a clearer operating model."
+  },
+  {
+    "number": 33,
+    "question": "A TypeScript tool schema declares quantity as a string, but the inventory executor requires a positive integer. Claude sometimes sends \"many\", and the executor fails after the call begins. Which correction best addresses the contract defect? const tool = { name: \"reserve_stock\", input_schema: { type: \"object\", properties: { sku: { type: \"string\" }, quantity: { type: \"string\" } }, required: [\"sku\", \"quantity\"] } }; Remove quantity from the tool schema. Let the executor infer the requested amount directly from the user's original message. The executor would parse data outside the tool contract.",
+    "options": [
+      "Remove quantity from the tool schema. Let the executor infer the requested amount directly from the user's original message. The executor would parse data outside the tool contract.",
+      "Declare quantity as an integer with appropriate constraints and validate the arguments before invoking the inventory service. Reject invalid quantities through the same check before any inventory is reserved.",
+      "Convert every received quantity with parseInt. Reserve inventory whenever JavaScript does not throw an exception during that conversion. Values such as partial numbers could still reserve inventory.",
+      "Keep quantity as a string in the schema. Add a longer description asking Claude to avoid nonnumeric words whenever possible. The executor would continue receiving an unvalidated string."
+    ],
+    "correctAnswers": [
+      "Declare quantity as an integer with appropriate constraints and validate the arguments before invoking the inventory service. Reject invalid quantities through the same check before any inventory is reserved."
+    ],
+    "explanation": "The tool schema should represent the executor's real input contract. An integer type and positive constraint guide generation and enable earlier validation. The result aligns with reliable tool selection and valid tool inputs. The application should still validate received arguments before changing inventory. Invalid values can be returned as clear tool errors rather than reaching the service. The implementation therefore follows the documented rule that tool names, descriptions, and input schemas must clearly distinguish each operation. This correction aligns the model-facing schema with the implementation. It reduces ambiguity and protects the external system from malformed requests. The team can therefore achieve predictable tool dispatch and simpler executor validation without adding unnecessary complexity."
+  },
+  {
+    "number": 34,
+    "question": "A healthcare assistant summarizes patient records for authorized clinicians, but the source files can contain unnecessary identifiers and records from different clinics. The deployment must reduce privacy exposure before any content reaches Claude. Which TWO actions should the developer take?",
+    "options": [
+      "Enforce tenant and clinician authorization before retrieving any records. Provide Claude only the records permitted for the specific request and approved purpose.",
+      "Replace patient identifiers with reversible values inside the user prompt. Include the recovery key in the same request so Claude can restore them when needed.",
+      "Send every available patient record to Claude. Let the model decide which information matters and remove sensitive details only from its final answer.",
+      "Remove fields that are unnecessary for the summary. Redact patient identifiers whenever the task can be completed without exposing those values to Claude.",
+      "Use one shared conversation history for every clinic. Rely on the larger combined history to help Claude recognize recurring medical terminology. All clinics would therefore contribute to one shared context."
+    ],
+    "correctAnswers": [
+      "Remove fields that are unnecessary for the summary. Redact patient identifiers whenever the task can be completed without exposing those values to Claude.",
+      "Enforce tenant and clinician authorization before retrieving any records. Provide Claude only the records permitted for the specific request and approved purpose."
+    ],
+    "explanation": "Data minimization reduces the amount of sensitive information exposed to the model and surrounding application components. Redaction is appropriate when identifiers are not needed for the requested summary. That behavior directly addresses protecting sensitive data while preserving authorized clinical use. Removing unnecessary fields before the request creates a stronger privacy boundary than asking the model to ignore them. It also reduces the chance of accidental logging or later disclosure. The design keeps control in the correct layer by recognizing that data minimization and least-privilege access must be enforced before model processing. This control limits impact even if another layer fails. The assistant still receives enough clinical content to perform the authorized task. This also makes the solution easier to verify and maintain in production. Authorization must be enforced by the application before sensitive records are retrieved. Tenant and clinician checks establish which data the requester is permitted to access. The result aligns with protecting sensitive data while preserving authorized clinical use. Passing only the authorized records preserves clinic boundaries and prevents cross-tenant leakage. The model should not be responsible for deciding access rights. The implementation therefore follows the documented rule that data minimization and least-privilege access must be enforced before model processing. Together with minimization, this creates a defense-in-depth design. The application controls identity and data scope before model processing begins. The team can therefore achieve privacy compliance and controlled exposure of patient information without adding unnecessary complexity."
+  },
+  {
+    "number": 35,
+    "question": "A legal comparison service sends several contracts in one request, but its output sometimes attributes a clause to the wrong document. The application must preserve source identity throughout analysis and final rendering. Which design is most appropriate? Concatenate every contract into one long string. Ask Claude to infer each source only from the order in which the document paragraphs appear.",
+    "options": [
+      "Concatenate every contract into one long string. Ask Claude to infer each source only from the order in which the document paragraphs appear.",
+      "Summarize each contract without retaining its identifier. Combine those summaries in a final request and ask Claude to reconstruct the missing attribution.",
+      "Remove all document names to prevent bias. Assign sources afterward according to the sequence of sentences in Claude's generated answer. Sentence order would become the application's attribution mechanism.",
+      "Send each contract as a separately labeled content section. Require source identifiers in the output and validate every cited identifier before display."
+    ],
+    "correctAnswers": [
+      "Send each contract as a separately labeled content section. Require source identifiers in the output and validate every cited identifier before display."
+    ],
+    "explanation": "Separate labeled sections preserve the boundary between source documents. Requiring those identifiers in the response gives the application an explicit attribution contract. The result aligns with preserving the identity and boundaries of every document in the comparison. Validation can reject an identifier that was not present in the request or map it back to the correct uploaded document. The final renderer does not need to infer provenance from prose. The implementation therefore follows the documented rule that separate content blocks and explicit document labels improve source attribution. This design improves traceability and user trust. It also supports later review because each comparison statement can be tied to a known source. The team can therefore achieve traceable comparisons and accurate clause attribution without adding unnecessary complexity."
+  },
+  {
+    "number": 36,
+    "question": "A tool-using service sends the following next request after Claude asks for inventory data. The API rejects the conversation because the tool result cannot be matched to the earlier call. Which correction should the developer make? { \"messages\": [ {\"role\": \"user\", \"content\": \"Check stock for SKU-19\"}, {\"role\": \"user\", \"content\": [ {\"type\": \"tool_result\", \"tool_use_id\": \"toolu_new\", \"content\": \"12\"} ]} ] }",
+    "options": [
+      "Remove the earlier user request and send only the tool result. Depend on the Messages API to retrieve the previous conversation from server-side memory.",
+      "Generate a new tool_use_id for the returned result. Let the API treat the executor response as unrelated to the tool request Claude originally created.",
+      "Convert the tool result into an assistant text message. Assume user messages cannot contain tool_result blocks associated with a prior assistant tool request.",
+      "Resend the prior assistant tool-use block. Return the executor result in a user message that carries the exact original tool_use_id. The identifier would preserve the original tool-call association."
+    ],
+    "correctAnswers": [
+      "Resend the prior assistant tool-use block. Return the executor result in a user message that carries the exact original tool_use_id. The identifier would preserve the original tool-call association."
+    ],
+    "explanation": "The Messages API is stateless, so the next request must include the relevant conversation history. That history includes the assistant block that requested the tool. This directly supports continuing the conversation with correctly linked tool results. The tool result must reference the exact identifier from that tool-use block. This lets Claude associate the executor output with the correct requested operation. This is consistent with the documented rule that tool results must reference the matching tool use and remain in the expected message sequence. Preserving both blocks restores a valid tool-use sequence. The model can then continue the same turn with the returned inventory value. In production, this supports reliable multi-turn tool execution and gives the team a clearer operating model."
+  },
+  {
+    "number": 37,
+    "question": "A compliance service repeatedly asks Claude to analyze the same policy PDF for different customer cases. The document is large, changes infrequently, and should not be uploaded again with every request. Which request design is most appropriate? Encode the PDF bytes inside an ordinary JSON string. Resend that serialized value whenever Claude must analyze the document for another case. Store the PDF in the application database and send only its record identifier. Expect the Messages API to retrieve the document automatically.",
+    "options": [
+      "Encode the PDF bytes inside an ordinary JSON string. Resend that serialized value whenever Claude must analyze the document for another case.",
+      "Store the PDF in the application database and send only its record identifier. Expect the Messages API to retrieve the document automatically.",
+      "Upload the policy through the Files API and retain the returned reference. Include that reference in later message content whenever a case requires the document.",
+      "Convert the PDF into a long system prompt and resend the complete text with every case. Make each request carry another full document copy."
+    ],
+    "correctAnswers": [
+      "Upload the policy through the Files API and retain the returned reference. Include that reference in later message content whenever a case requires the document."
+    ],
+    "explanation": "The Files API provides a reusable reference for uploaded content. Later Messages API requests can include that file reference instead of transferring the same document bytes for every case. This directly supports reusing stable large input across repeated requests. Using the documented document content structure lets Claude process the PDF as a supported input. The application still supplies each customer case separately so the analysis remains specific to that request. This is consistent with the documented rule that prompt caching only helps when identical cacheable content is reused within the documented rules. This design reduces repeated upload work and keeps the request contract explicit. The application can replace the stored file reference when a new policy version is approved. In production, this supports lower latency and lower input-processing cost and gives the team a clearer operating model."
+  },
+  {
+    "number": 38,
+    "question": "A customer-support application has a prompt and model configuration that currently meet its service targets. The team needs to introduce a revised prompt without disrupting production and must be able to identify the cause of any regression. Which lifecycle approach is most appropriate? Replace the production prompt immediately. Ask support agents to report unusual answers so the team can reconstruct the earlier configuration if a regression appears. Keep the current prompt permanently after it meets production targets. Avoid future changes even when requirements or documented model behavior evolve. Future prompt improvements would remain unavailable to users.",
+    "options": [
+      "Replace the production prompt immediately. Ask support agents to report unusual answers so the team can reconstruct the earlier configuration if a regression appears.",
+      "Keep the current prompt permanently after it meets production targets. Avoid future changes even when requirements or documented model behavior evolve. Future prompt improvements would remain unavailable to users.",
+      "Version the prompt with its related configuration and test the candidate against established evaluations. Release gradually while retaining a documented rollback path.",
+      "Change the prompt together with the model and output parser. Treat the combined release as one improvement that can be evaluated after deployment."
+    ],
+    "correctAnswers": [
+      "Version the prompt with its related configuration and test the candidate against established evaluations. Release gradually while retaining a documented rollback path."
+    ],
+    "explanation": "Versioning creates a traceable relationship between the candidate prompt, model configuration, evaluation results, and deployment. The team can identify exactly what changed when a regression appears. The result aligns with introducing new response behavior without disrupting a stable service. Running the established evaluation set before release catches known failure modes. A gradual rollout then reveals production behavior while limiting exposure to the new configuration. The implementation therefore follows the documented rule that configuration changes should be isolated, tested, versioned, and rolled out gradually. Retaining the previous version makes rollback an operational action rather than a reconstruction exercise. This approach supports controlled change throughout development, release, operation, and maintenance. The team can therefore achieve controlled experimentation and reliable rollback without adding unnecessary complexity."
+  },
+  {
+    "number": 39,
+    "question": "A TypeScript support dashboard displays Claude output as it arrives, but it currently treats every stream event as a complete response. The application must show partial text while still producing one reliable final message for storage. Which implementation should the developer use? const stream = client.messages.stream(request); for await (const event of stream) { saveMessage(event); }",
+    "options": [
+      "Append text deltas and content block events to an in-memory accumulator. After the stream completes successfully, store the SDK's final assembled message as one assistant turn.",
+      "Restart the streaming request whenever a content delta arrives. Use the partial text as assistant history for the newly created request. Each arriving delta would therefore trigger another model generation.",
+      "Write each streaming event to the conversation table as a separate assistant turn. Combine those rows only when the user later reloads the conversation.",
+      "Ignore incremental events and wait for the connection to close. Parse the complete response as one ordinary JSON object before showing anything to the user."
+    ],
+    "correctAnswers": [
+      "Append text deltas and content block events to an in-memory accumulator. After the stream completes successfully, store the SDK's final assembled message as one assistant turn."
+    ],
+    "explanation": "Streaming events are incremental pieces rather than independent assistant turns. Accumulating those pieces lets the interface update while preserving one coherent response. That behavior directly addresses responsive streaming while preserving one coherent assistant response. The SDK can provide the completed message after the event stream finishes. Storing that final object preserves content blocks, usage data, and the stop reason together. The design keeps control in the correct layer by recognizing that stream events are incremental parts of a single logical message. This approach separates display concerns from durable conversation state. It prevents duplicate messages and gives later processing a complete response contract. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 40,
+    "question": "A Claude Code workflow can run shell commands, and the organization wants to prevent destructive production commands even when a user accidentally approves a broad session mode. The control must intervene before execution and leave enough information for the workflow to respond safely. Which TWO hook behaviors should the team implement?",
+    "options": [
+      "Return an explicit denial reason after blocking the command. Give Claude enough information to revise its plan without repeatedly requesting the prohibited action.",
+      "Add the prohibited command to CLAUDE.md. Trust the model to remember the instruction even when another prompt requests the operation. Enforcement would depend entirely on instruction following.",
+      "Use a PostToolUse hook to restore production data after a destructive command finishes. Treat recovery as the primary control for prohibited operations.",
+      "Use a PreToolUse hook that inspects matched shell commands. Block prohibited production operations before the command can execute. The shell command would be evaluated before execution.",
+      "Disable logging for every blocked command. Prevent the organization from retaining evidence about attempted destructive actions or repeated requests. Blocked attempts would leave no operational audit trail."
+    ],
+    "correctAnswers": [
+      "Use a PreToolUse hook that inspects matched shell commands. Block prohibited production operations before the command can execute. The shell command would be evaluated before execution.",
+      "Return an explicit denial reason after blocking the command. Give Claude enough information to revise its plan without repeatedly requesting the prohibited action."
+    ],
+    "explanation": "A PreToolUse hook runs before the command and can prevent execution. Matching the shell tool and inspecting its input creates a deterministic guardrail. The result aligns with blocking unsafe shell commands before they execute. The block should be based on organization policy rather than model judgment. It remains effective even when the session has broader permissions. The implementation therefore follows the documented rule that deterministic hooks can inspect and reject tool actions regardless of model intent. This control stops the destructive action at the correct boundary. It is safer than trying to repair damage after execution. The team can therefore achieve enforceable guardrails for command execution without adding unnecessary complexity. A clear denial response tells Claude why the requested operation cannot proceed. The agent can then choose a safe alternative or ask for additional approval. This directly supports blocking unsafe shell commands before they execute. Without useful feedback, the loop may repeat the same blocked call. Structured reasons improve recovery while preserving the guardrail. This is consistent with the documented rule that deterministic hooks can inspect and reject tool actions regardless of model intent. Combining prevention with actionable feedback supports both safety and task completion. The hook also creates an auditable policy decision. In production, this supports enforceable guardrails for command execution and gives the team a clearer operating model."
+  },
+  {
+    "number": 41,
+    "question": "A Python cost report estimates usage by dividing character counts by four, but its totals differ significantly from the API bill. The workload includes tools, system instructions, and cached prompt content. Which correction gives the most defensible estimate? estimated_input = len(prompt) // 4",
+    "options": [
+      "Count tokens before sending requests and reconcile estimates with returned usage fields. Include cache-related token categories and the selected model's documented pricing.",
+      "Use the longest response observed during testing as the fixed token estimate. Apply that number to future requests regardless of prompt or model changes.",
+      "Multiply the character estimate by the number of available tools. Assume every tool definition always consumes exactly one token for each character.",
+      "Ignore input usage and calculate cost only from max_tokens. Assume the API charges for the complete output allowance on every request. Actual input consumption would be excluded from the estimate."
+    ],
+    "correctAnswers": [
+      "Count tokens before sending requests and reconcile estimates with returned usage fields. Include cache-related token categories and the selected model's documented pricing."
+    ],
+    "explanation": "Character heuristics can be useful for rough planning but do not represent the actual request structure. Token counting can include the content sent with system instructions and tools. That behavior directly addresses measuring usage with the same tokenization rules used by the API. Response usage fields provide the measured categories needed for reconciliation. Cache writes and cache reads should be priced according to the applicable model rates. The design keeps control in the correct layer by recognizing that character-based estimates cannot replace official token counting or reported usage. This method creates an auditable cost model based on documented measurements. It can also identify which prompt components are driving unexpected spend. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 42,
+    "question": "A moderation service builds one prompt from trusted policy text and an untrusted forum post. The policy must control the classification, while instructions inside the post must be treated only as content. Which TWO revisions should the developer make? { \"prompt\": \"Policy: \" + policy + \"\\nPost: \" + post + \"\\nReturn a label.\" } Add several unrelated policy documents to the prompt. Reduce the apparent proportion of malicious instructions by increasing the total context size. The additional documents would remain unrelated to the classification.",
+    "options": [
+      "Add several unrelated policy documents to the prompt. Reduce the apparent proportion of malicious instructions by increasing the total context size. The additional documents would remain unrelated to the classification.",
+      "Place the stable moderation rules in the system instruction. Keep the submitted forum post in user content so trusted instructions remain clearly separated.",
+      "Ask Claude to report any hidden instructions before returning the label. Trust the classification whenever the model says that none were found.",
+      "Put the forum post before the policy. Let Claude process possible user-supplied instructions before it reaches the trusted moderation rules. The model would encounter the untrusted content first.",
+      "Wrap the policy and forum post in clearly named XML sections. State explicitly that text inside the post section is data rather than instruction."
+    ],
+    "correctAnswers": [
+      "Place the stable moderation rules in the system instruction. Keep the submitted forum post in user content so trusted instructions remain clearly separated.",
+      "Wrap the policy and forum post in clearly named XML sections. State explicitly that text inside the post section is data rather than instruction."
+    ],
+    "explanation": "Stable application behavior belongs in a high-authority instruction location. Keeping the untrusted post in user content preserves a clearer trust boundary. That behavior directly addresses keeping trusted policy instructions authoritative over untrusted content. The model can then apply the moderation rules to the supplied data instead of treating both sources as equivalent directions. The application remains responsible for enforcing any sensitive actions. The design keeps control in the correct layer by recognizing that untrusted data must stay separate from control instructions and remain constrained by guardrails. This placement makes the prompt easier to maintain and test. Policy changes can be versioned without mixing them into user-provided text. This also makes the solution easier to verify and maintain in production. Named sections make the purpose of each content block explicit. An instruction that identifies the post as untrusted data reduces ambiguity about how embedded text should be interpreted. The result aligns with keeping trusted policy instructions authoritative over untrusted content. XML structure is especially useful when prompts contain several components with different roles. It helps preserve boundaries as content becomes longer or more complex. The implementation therefore follows the documented rule that untrusted data must stay separate from control instructions and remain constrained by guardrails. Combined with system-level policy placement, this revision creates a more robust prompt contract. It does not depend on the submitted post behaving safely. The team can therefore achieve safer classification and controlled behavior when hostile text is present without adding unnecessary complexity."
+  },
+  {
+    "number": 43,
+    "question": "A developer sends a long system instruction, several conversation turns, and tool definitions in one Claude request. The request approaches the model's context limit before any answer is generated. Which statement best explains the relevant token budget? Count tool definitions as output tokens only after Claude selects a tool. Assume removing unused tools cannot reduce the initial request size. Apply the context limit separately to every message block. Allow several individually valid blocks to exceed the model's total request capacity. The request builder would ignore aggregate context usage.",
+    "options": [
+      "Count tool definitions as output tokens only after Claude selects a tool. Assume removing unused tools cannot reduce the initial request size.",
+      "Apply the context limit separately to every message block. Allow several individually valid blocks to exceed the model's total request capacity. The request builder would ignore aggregate context usage.",
+      "Count only the latest user message toward the context limit. Treat system instructions and tool definitions as metadata outside the model's working context.",
+      "Fit the complete input within the context window while reserving capacity for generated output. Count instructions and messages together with tools and supplied content."
+    ],
+    "correctAnswers": [
+      "Fit the complete input within the context window while reserving capacity for generated output. Count instructions and messages together with tools and supplied content."
+    ],
+    "explanation": "Claude processes the request as a combined context rather than as unrelated per-field budgets. System instructions, messages, tools, and supplied content all contribute to the input presented to the model. This directly supports reserving enough capacity for both the request and the generated response. The application must also reserve enough capacity for the expected response. A request that fills the available context can leave insufficient room for generated text or other output blocks. This is consistent with the documented rule that input and output tokens share the same finite context window. Understanding the combined budget guides practical decisions such as pruning history, narrowing the tool set, or retrieving information when needed. These changes protect both request validity and response quality. In production, this supports predictable request admission and safer token budgeting and gives the team a clearer operating model."
+  },
+  {
+    "number": 44,
+    "question": "A financial institution must execute the same four review steps for every account closure, and auditors require the steps to occur in a fixed order. Claude may summarize evidence within each step, but it must not choose a different process. Which architecture best fits?",
+    "options": [
+      "Implement a deterministic workflow that invokes Claude only within defined stages. Record completion of every required checkpoint before the application proceeds. The application would control the sequence outside the model.",
+      "Store the four review steps in persistent memory. Rely on the model to recall their correct order without application-level orchestration. No code-level checkpoint would enforce the required order.",
+      "Launch independent subagents that compete to close the account. Accept whichever result finishes first without verifying that every required review occurred. Completion time would become the result-selection rule.",
+      "Create an autonomous agent with broad tool access. Let it discover a different review sequence for each account before deciding whether closure is allowed."
+    ],
+    "correctAnswers": [
+      "Implement a deterministic workflow that invokes Claude only within defined stages. Record completion of every required checkpoint before the application proceeds. The application would control the sequence outside the model."
+    ],
+    "explanation": "The required process is known in advance and must be repeatable. A deterministic workflow can encode the four stages and prevent Claude from skipping or reordering them. This directly supports a repeatable process with controlled execution order. Claude can still perform judgment tasks inside a stage, such as summarizing supporting evidence. The application controls transitions and records checkpoint results. This is consistent with the documented rule that workflows fit known steps while agents fit open-ended paths. This design supports auditability without granting unnecessary autonomy. It makes failures easier to identify and allows the process to resume from a known stage. In production, this supports auditability, predictable recovery, and consistent execution and gives the team a clearer operating model."
+  },
+  {
+    "number": 45,
+    "question": "A team changes a shared response handler to support a new content block type. The modification affects many services and could silently drop existing text or tool results. Which evidence should reviewers require before approving the change?",
+    "options": [
+      "Add unit tests for every supported block type and an integration test for the response flow. Preserve regression coverage for existing consumers.",
+      "Accept a screenshot showing one plausible local response. Treat that single developer run as sufficient evidence that the updated handler is safe.",
+      "Promise to add tests after production deployment. Wait until a consuming service reports missing content before creating regression coverage. Regression coverage would begin only after a reported failure.",
+      "Approve the change because the modified handler contains fewer lines than the previous implementation. Use code size as the main quality measure."
+    ],
+    "correctAnswers": [
+      "Add unit tests for every supported block type and an integration test for the response flow. Preserve regression coverage for existing consumers."
+    ],
+    "explanation": "Unit tests verify the handler's behavior for text, tool, and newly supported blocks. They make edge cases repeatable and fast to diagnose. The result aligns with changing shared code without dropping supported response behavior. An integration test confirms that real request and response sequencing works through the surrounding service. Regression coverage protects established consumers from silent changes. The implementation therefore follows the documented rule that broad refactors need unit, integration, and regression tests around the existing contract. This evidence addresses both local logic and system behavior. Reviewers can approve the change against defined expectations rather than appearance. The team can therefore achieve safer changes across dependent services without adding unnecessary complexity."
+  },
+  {
+    "number": 46,
+    "question": "A maintenance agent can delete obsolete files from a shared production repository. The team wants useful automation, but an incorrect interpretation could remove active customer assets. Which deployment design provides the strongest practical guardrail? Allow automatic deletion only during low-traffic hours. Assume a mistaken removal is safer when fewer users are actively sending requests. Execution timing would serve as the primary safety control. Copy the repository into the model context for inspection. Let Claude delete directly from production after reading the files without an independent execution control.",
+    "options": [
+      "Allow automatic deletion only during low-traffic hours. Assume a mistaken removal is safer when fewer users are actively sending requests. Execution timing would serve as the primary safety control.",
+      "Copy the repository into the model context for inspection. Let Claude delete directly from production after reading the files without an independent execution control.",
+      "Give the agent read access first and require a deletion plan. Execute only reviewed file operations after a narrowly scoped approval step authorizes them.",
+      "Run the agent with unrestricted repository permissions. Depend on a detailed system prompt to prevent accidental deletion of files that still support active customers."
+    ],
+    "correctAnswers": [
+      "Give the agent read access first and require a deletion plan. Execute only reviewed file operations after a narrowly scoped approval step authorizes them."
+    ],
+    "explanation": "Separating planning from execution lets the agent gather evidence without immediately changing production state. A human or deterministic policy can review the exact proposed deletions before authority is granted. This directly supports limiting destructive capabilities and requiring approval for sensitive actions. Narrowly scoped permissions limit the effect of a mistaken decision. The executor should receive access only to the approved files and only for the action required by the reviewed plan. This is consistent with the documented rule that least privilege and explicit authorization should constrain high-impact tools. This layered design preserves automation while placing a checkpoint before an irreversible operation. It also creates an auditable record of what was proposed, approved, and executed. In production, this supports safer automation with human accountability and gives the team a clearer operating model."
+  },
+  {
+    "number": 47,
+    "question": "A document platform is building an MCP server. Users need to browse a read-only document catalog, and Claude must be able to update a selected document after approval. Which TWO primitives should the server expose? Expose the document catalog as an MCP prompt. Treat prompts as the application-controlled mechanism for retrieving current server data whenever the interface loads. Expose document updates as an MCP resource. Assume resources can modify external systems whenever the model requests a write operation. The client would attempt writes through a read-oriented primitive. Describe both capabilities only in the system instruction. Avoid MCP primitives because Claude already knows the document service's network address. Clients would receive no discoverable MCP interface.",
+    "options": [
+      "Expose the document catalog as an MCP prompt. Treat prompts as the application-controlled mechanism for retrieving current server data whenever the interface loads.",
+      "Expose document updates as an MCP resource. Assume resources can modify external systems whenever the model requests a write operation. The client would attempt writes through a read-oriented primitive.",
+      "Describe both capabilities only in the system instruction. Avoid MCP primitives because Claude already knows the document service's network address. Clients would receive no discoverable MCP interface.",
+      "Expose document updates as an MCP tool with a clear input schema. Validate every requested change on the server before execution. Claude could request the update through a validated operation.",
+      "Expose the document catalog as an MCP resource. Let clients list or read the available data without asking Claude to execute an action."
+    ],
+    "correctAnswers": [
+      "Expose the document catalog as an MCP resource. Let clients list or read the available data without asking Claude to execute an action.",
+      "Expose document updates as an MCP tool with a clear input schema. Validate every requested change on the server before execution. Claude could request the update through a validated operation."
+    ],
+    "explanation": "Resources are appropriate for data that the application or user can browse and read. A document catalog fits this read-oriented primitive. The result aligns with exposing data and actions through the correct MCP primitive. The client can present available documents or include selected content without treating retrieval as a model-controlled action. The server remains the source of current catalog data. The implementation therefore follows the documented rule that resources are application-controlled data, tools are model-controlled actions, and prompts are user-invoked templates. This design gives the platform a clear read boundary. It also avoids creating a tool call for ordinary catalog navigation. The team can therefore achieve clear MCP behavior and maintainable integrations without adding unnecessary complexity. Updating a document is an action that changes external state. A tool provides a named operation and an input schema for that change. This directly supports exposing data and actions through the correct MCP primitive. The server can validate the document identifier, requested edit, and approval context before applying it. Tool errors can be returned in a structured way. This is consistent with the documented rule that resources are application-controlled data, tools are model-controlled actions, and prompts are user-invoked templates. Combining a resource for discovery with a tool for mutation matches the control model of each primitive. The interface remains understandable to clients and models. In production, this supports clear MCP behavior and maintainable integrations and gives the team a clearer operating model."
+  },
+  {
+    "number": 48,
+    "question": "A team plans to move a regulated extraction workload to a newer Claude release. The current model already meets accuracy requirements, and the team is concerned about breaking behavior changes. Which migration approach is most appropriate? Change the model and output schema in the same deployment. Use one release window even though the two changes cannot be evaluated separately. Switch the production alias to the new model immediately. Assume every newer release preserves existing prompt behavior and output compatibility. All production traffic would move without a compatibility check.",
+    "options": [
+      "Change the model and output schema in the same deployment. Use one release window even though the two changes cannot be evaluated separately.",
+      "Switch the production alias to the new model immediately. Assume every newer release preserves existing prompt behavior and output compatibility. All production traffic would move without a compatibility check.",
+      "Pin the candidate model version and run existing task evaluations. Compare latency and cost, then use a monitored canary with a tested rollback path.",
+      "Keep the current model permanently. Treat any migration risk as evidence that future improvements are unsuitable for regulated workloads. The deployment would avoid every future model migration."
+    ],
+    "correctAnswers": [
+      "Pin the candidate model version and run existing task evaluations. Compare latency and cost, then use a monitored canary with a tested rollback path."
+    ],
+    "explanation": "A pinned candidate creates a reproducible target for evaluation. The team can compare output quality, compatibility, latency, and cost against the approved baseline. That behavior directly addresses upgrading models without disrupting a regulated workload. A monitored canary limits exposure while gathering production evidence. A rollback path allows the organization to restore the previous version if a critical difference appears. The design keeps control in the correct layer by recognizing that model changes require evaluation, version pinning, and staged rollout because behavior can change. This process manages release change without assuming backward compatibility. It supports regulated review and deliberate adoption. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 49,
+    "question": "A travel assistant has two tools named lookup and lookup2, and both descriptions say they find information. Claude frequently selects the wrong tool or supplies incomplete arguments. Which change most directly improves tool selection? Move both tool descriptions into the user's message and remove the tools array. Ask Claude to return the preferred function name as ordinary text.",
+    "options": [
+      "Move both tool descriptions into the user's message and remove the tools array. Ask Claude to return the preferred function name as ordinary text.",
+      "Give each tool a distinct action-oriented name and a precise description. Define a schema that clearly explains every required argument and valid value.",
+      "Combine both executors behind one tool that accepts an untyped string. Parse Claude's free-form instructions manually after every tool request. The executor would interpret the string after every selection.",
+      "Increase the model's output token limit. Give Claude more generation space to decide which of the two similarly described tools should be selected."
+    ],
+    "correctAnswers": [
+      "Give each tool a distinct action-oriented name and a precise description. Define a schema that clearly explains every required argument and valid value."
+    ],
+    "explanation": "Claude chooses tools from the names, descriptions, and schemas supplied in the request. Clear distinctions help the model connect the user's intent to the correct capability. This directly supports reliable tool selection and valid tool inputs. Well-described arguments reduce missing or incorrectly formatted inputs. The schema should express required fields and types instead of relying on hidden executor assumptions. This is consistent with the documented rule that tool names, descriptions, and input schemas must clearly distinguish each operation. This improvement addresses the cause of the selection failures without changing the task. It also makes validation and tool debugging more predictable. In production, this supports predictable tool dispatch and simpler executor validation and gives the team a clearer operating model."
+  },
+  {
+    "number": 50,
+    "question": "A TypeScript team is replacing a shared Claude gateway used by many services. The current proposal changes the request model and every caller in one pull request without compatibility tests. Which revision most reduces migration risk? interface Gateway { send(prompt: string): Promise<string>; }",
+    "options": [
+      "Introduce a compatibility adapter and contract tests. Migrate callers through small reviewed changes before removing the old interface after all dependencies have moved.",
+      "Keep both interfaces indefinitely and route traffic randomly between them. Do not record which gateway produced each response or failure. Traffic analysis could not identify the responsible implementation.",
+      "Delete the old interface before migrating callers. Use compilation failures to locate required changes and repair remaining production services after deployment. Caller failures would become the migration discovery mechanism.",
+      "Rename the interface and update every caller in one combined change. Ask reviewers to verify the entire migration through a single large diff."
+    ],
+    "correctAnswers": [
+      "Introduce a compatibility adapter and contract tests. Migrate callers through small reviewed changes before removing the old interface after all dependencies have moved."
+    ],
+    "explanation": "A compatibility adapter lets existing callers continue working while the new contract is introduced. Contract tests verify that both paths preserve required request and response behavior. The result aligns with changing a shared integration without breaking dependent callers. Small reviewed migrations make failures easier to isolate. The team can observe each service before removing the old interface. The implementation therefore follows the documented rule that API contract changes require compatibility planning, versioning, and staged migration. This sequence supports safe refactoring across a large dependency graph. It also creates a clear rollback point if the new gateway behaves differently. The team can therefore achieve safe adoption across all consuming services without adding unnecessary complexity."
+  },
+  {
+    "number": 51,
+    "question": "A team shares Claude Code settings through the repository but each developer also has personal preferences. A local developer setting unexpectedly overrides the team's intended permission rule. What should the team do first to diagnose and correct the configuration?",
+    "options": [
+      "Inspect the effective configuration and documented settings precedence. Identify the higher-priority source before moving or removing the conflicting rule at the proper scope.",
+      "Delete all repository settings and rely on verbal team guidance. Let personal configuration remain the only source of executable permission behavior. Personal settings would become the remaining configuration source.",
+      "Rename settings.json to CLAUDE.md. Assume instruction files override every configuration source and are the correct place for permission rules. Permission behavior would be moved into an instruction file.",
+      "Add the same permission rule to every available settings file and rely on duplicate values. Assume Claude Code will choose the repository version regardless of documented scope precedence across every developer session."
+    ],
+    "correctAnswers": [
+      "Inspect the effective configuration and documented settings precedence. Identify the higher-priority source before moving or removing the conflicting rule at the proper scope."
+    ],
+    "explanation": "Claude Code can combine settings from several scopes, so the first task is to identify which source produced the effective value. Diagnostic information and documented precedence reveal the actual override. That behavior directly addresses understanding which shared and local setting controls final Claude Code behavior. The team can then place the rule at the intended scope or remove the conflicting higher-priority entry. This preserves legitimate personal preferences while enforcing the shared permission requirement correctly. The design keeps control in the correct layer by recognizing that configuration scope and precedence determine how repository and personal settings combine. Resolving the source is safer than adding duplicates blindly. It also gives the team a repeatable method for future configuration incidents. This also makes the solution easier to verify and maintain in production."
+  },
+  {
+    "number": 52,
+    "question": "A claims application asks Claude to return an eligibility decision that another service consumes automatically. The downstream service requires a stable contract and must reject malformed responses before updating a customer record. Which application design best meets these requirements? Request concise prose from Claude. Let the downstream service infer the decision and supporting fields from whichever wording the model produces for each claim. Write the model response directly to the customer record. Run a nightly report to find malformed decisions after other services have already consumed them. Place the desired JSON example only in a user message. Assume one matching response proves that every later generation will remain structurally compatible.",
+    "options": [
+      "Request concise prose from Claude. Let the downstream service infer the decision and supporting fields from whichever wording the model produces for each claim.",
+      "Write the model response directly to the customer record. Run a nightly report to find malformed decisions after other services have already consumed them.",
+      "Place the desired JSON example only in a user message. Assume one matching response proves that every later generation will remain structurally compatible.",
+      "Define a structured output schema and validate the returned object against the business contract. Stop the record update when required fields or allowed values are invalid."
+    ],
+    "correctAnswers": [
+      "Define a structured output schema and validate the returned object against the business contract. Stop the record update when required fields or allowed values are invalid."
+    ],
+    "explanation": "A structured schema gives Claude an explicit response contract and gives the application a dependable object to validate. The update proceeds only when the returned fields satisfy both structural and business rules. The result aligns with producing machine-consumable output that is structurally and semantically valid. Schema validation should be followed by application-level checks for allowed values and required relationships. A syntactically valid object can still contain a decision that violates the system's domain rules. The implementation therefore follows the documented rule that schema validation must be combined with business-rule validation and defensive parsing. Stopping the write on validation failure protects the customer record and creates a clear recovery path. The application can log the issue, request a repair, or route the case for review without spreading invalid data. The team can therefore achieve safe downstream automation and trustworthy decisions without adding unnecessary complexity."
+  },
+  {
+    "number": 53,
+    "question": "An invoice extractor returns schema-valid JSON, but one response reports a negative tax and a total that does not equal the sum of line items. The downstream system must not post financially impossible records. Which handling approach should the developer use? { \"subtotal\": 100, \"tax\": -50, \"total\": 175 }",
+    "options": [
+      "Ask Claude to confirm that its JSON is correct. Post the invoice whenever the model answers yes without independent application checks. The model's self-assessment would authorize the accounting write.",
+      "Convert every numeric field into a string before processing. Prevent the accounting system from detecting arithmetic inconsistencies in the returned invoice. The accounting service would receive text instead of numeric values.",
+      "Accept the response immediately after schema validation. Assume a structurally valid object also guarantees that every value satisfies the accounting domain's rules.",
+      "Apply business-rule validation after schema validation. Reject inconsistent invoices or route them to a controlled review path before posting any record. Only invoices that pass both checks would proceed."
+    ],
+    "correctAnswers": [
+      "Apply business-rule validation after schema validation. Reject inconsistent invoices or route them to a controlled review path before posting any record. Only invoices that pass both checks would proceed."
+    ],
+    "explanation": "Schema validation confirms structure and data types, not every domain rule. The values can be valid numbers while still representing an impossible invoice. That behavior directly addresses producing machine-consumable output that is structurally and semantically valid. Business checks can verify nonnegative amounts and arithmetic relationships before posting. Failed records can be retried, corrected through a controlled process, or reviewed by a human. The design keeps control in the correct layer by recognizing that schema validation must be combined with business-rule validation and defensive parsing. This layered validation protects the financial system from confident but invalid output. It treats model responses as untrusted application input. This also makes the solution easier to verify and maintain in production."
+  }
+]
