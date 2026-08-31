@@ -146,75 +146,69 @@ export default function ExamContent({
       {/* Top Main Navigation Bar (Visible when not hidden) */}
       {!isHeaderHidden && (
         <header className="exam-navbar">
-          <div className="navbar-brand">
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => navigate('/')}
-              title="Go to Home / Exam Selection"
-            >
-              <Home size={15} /> Home
-            </button>
-          </div>
-
-          {/* Center Quick Stats */}
-          <div className="navbar-stats">
-            <div className="stat-item stat-answered" title="Answered questions">
-              <CheckCircle2 size={16} className="icon-emerald" />
-              <span className="stat-label">Answered:</span>
-              <span className="stat-value">{stats.answered} / {questions.length}</span>
+          <div className="exam-navbar-container">
+            <div className="navbar-brand">
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => navigate('/')}
+                title="Go to Home / Exam Selection"
+              >
+                <Home size={15} /> <span className="nav-btn-text">Home</span>
+              </button>
             </div>
-            <div className="stat-divider" />
-            <div className="stat-item stat-flagged" title="Flagged questions">
-              <Bookmark size={16} className="icon-amber" />
-              <span className="stat-label">Flagged:</span>
-              <span className="stat-value">{stats.flagged}</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat-item stat-unvisited" title="Unvisited questions">
-              <Circle size={16} className="icon-muted" />
-              <span className="stat-label">Unvisited:</span>
-              <span className="stat-value">{stats.notVisited}</span>
-            </div>
-          </div>
 
-          {/* Right Actions & Controls */}
-          <div className="navbar-controls">
-            {/* Jump to Question Pop-up Button */}
-            <button
-              className="btn btn-secondary btn-sm"
-              onClick={() => setIsGridModalOpen(true)}
-            >
-              <Grid size={16} /> Questions ({currentIdx + 1}/{questions.length})
-            </button>
-
-            {/* Timer Display ONLY in Timed Exam Mode */}
-            {!isPrepareMode && (
-              <div className="timer-wrapper">
-                <Timer
-                  initialSeconds={120 * 60}
-                  isPaused={isPaused}
-                  onTimeUp={handleFinish}
-                  sessionData={sessionData}
-                />
+            {/* Center Quick Stats */}
+            <div className="navbar-stats">
+              <div className="stat-item stat-answered" title="Answered questions">
+                <CheckCircle2 size={15} className="icon-emerald" />
+                <span className="navbar-stat-label">Answered:</span>
+                <span className="stat-value">{stats.answered} / {questions.length}</span>
               </div>
-            )}
+              <div className="stat-divider" />
+              <div className="stat-item stat-flagged" title="Flagged questions">
+                <Bookmark size={15} className="icon-amber" />
+                <span className="navbar-stat-label">Flagged:</span>
+                <span className="stat-value">{stats.flagged}</span>
+              </div>
+              <div className="stat-divider" />
+              <div className="stat-item stat-unvisited" title="Unvisited questions">
+                <Circle size={15} className="icon-muted" />
+                <span className="navbar-stat-label">Unvisited:</span>
+                <span className="stat-value">{stats.notVisited}</span>
+              </div>
+            </div>
 
-            {/* Hide Header Button */}
-            <button
-              className="btn btn-ghost btn-sm"
-              onClick={() => setIsHeaderHidden(true)}
-              title="Hide top header to maximize screen height"
-            >
-              <EyeOff size={16} /> Hide Header
-            </button>
+            {/* Right Actions & Controls */}
+            <div className="navbar-controls">
+              {/* Jump to Question Pop-up Button */}
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={() => setIsGridModalOpen(true)}
+                title="Questions Navigator Grid"
+              >
+                <Grid size={15} /> <span className="nav-btn-text">Questions</span> ({currentIdx + 1}/{questions.length})
+              </button>
 
-            <button className="btn btn-ghost btn-sm" onClick={() => setIsPaused(true)}>
-              <PauseCircle size={18} /> Pause
-            </button>
+              {/* Timer Display ONLY in Timed Exam Mode */}
+              {!isPrepareMode && (
+                <div className="timer-wrapper">
+                  <Timer
+                    initialSeconds={120 * 60}
+                    isPaused={isPaused}
+                    onTimeUp={handleFinish}
+                    sessionData={sessionData}
+                  />
+                </div>
+              )}
 
-            <button className="btn btn-primary btn-sm" onClick={handleFinish}>
-              <Award size={16} /> Finish
-            </button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setIsPaused(true)} title="Pause Exam">
+                <PauseCircle size={16} /> <span className="nav-btn-text">Pause</span>
+              </button>
+
+              <button className="btn btn-primary btn-sm" onClick={handleFinish} title="Finish Exam">
+                <Award size={15} /> <span className="nav-btn-finish">Finish</span>
+              </button>
+            </div>
           </div>
         </header>
       )}

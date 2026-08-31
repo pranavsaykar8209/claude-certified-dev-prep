@@ -52,12 +52,19 @@
   background: rgba(13, 19, 34, 0.85);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 0.9rem 2.25rem;
+  width: 100%;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+.exam-navbar-container {
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.9rem 2.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1.25rem;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .navbar-brand {
@@ -279,6 +286,11 @@
   transform: translateY(-1px);
 }
 
+/* Mobile-only ChatGPT Icon Button (hidden on desktop so button is never duplicated) */
+.mobile-chatgpt-icon-btn {
+  display: none !important;
+}
+
 .btn-flag {
   display: inline-flex;
   align-items: center;
@@ -320,6 +332,7 @@
 
 /* Question Card */
 .question-card {
+  position: relative;
   background: var(--bg-card);
   backdrop-filter: blur(20px);
   border: 1px solid var(--border-subtle);
@@ -1332,20 +1345,452 @@
   margin: 0;
 }
 
-/* Responsive Rules */
-@media (max-width: 768px) {
-  .exam-navbar {
-    flex-wrap: wrap;
-    padding: 0.75rem 1rem;
+/* ==========================================================================
+   Comprehensive Mobile & Tablet Responsive Design System
+   ========================================================================== */
+
+@media (max-width: 992px) {
+  .results-body {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
+
+  .question-detail-card {
+    position: relative;
+    top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Top Exam Header Navigation */
+  .exam-navbar {
+    padding: 0;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .exam-navbar-container {
+    padding: 0.5rem 0.65rem;
+    gap: 0.35rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .navbar-brand {
+    gap: 0.3rem;
+    display: flex;
+    align-items: center;
+  }
+
   .navbar-stats {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    justify-content: space-around;
+    padding: 0.3rem 0.4rem;
+    gap: 0.25rem;
+    font-size: 0.725rem;
+    margin-top: 0.15rem;
+    background: rgba(18, 26, 43, 0.75);
+    border-radius: 9999px;
+    overflow: hidden;
+  }
+
+  .navbar-stat-label {
+    display: none; /* Hide verbose label on mobile navbar to leave clean icons + values */
+  }
+
+  .navbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .navbar-controls .btn-sm {
+    padding: 0.3rem 0.45rem;
+    font-size: 0.725rem;
+    gap: 0.2rem;
+  }
+
+  .navbar-controls .btn-ghost {
+    padding: 0.3rem 0.4rem;
+  }
+
+  .timer-wrapper {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.85rem;
+  }
+
+  /* Main Container & Question Display */
+  .exam-main-container {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .question-card {
+    padding: 1.15rem 0.85rem;
+    border-radius: 16px;
+    gap: 1rem;
+  }
+
+  .question-card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .header-meta-group {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .header-action-group {
+    display: flex;
+    gap: 0.35rem;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .header-action-group::-webkit-scrollbar {
     display: none;
   }
-  .exam-main-container {
-    padding: 1rem 0.75rem;
+
+  .header-action-group .btn-sm,
+  .header-action-group .btn-flag {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
+
+  /* Hide 'Hide Header' and 'Fullscreen' buttons on mobile view */
+  .btn-hide-header-desktop,
+  .btn-fullscreen-desktop {
+    display: none !important;
+  }
+
+  .question-prompt p {
+    font-size: 0.975rem;
+    line-height: 1.55;
+  }
+
+  /* AI Toolbar */
+  .ai-toolbar {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.65rem;
+  }
+
+  .ai-toolbar .btn {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* On mobile view, show ChatGPT icon button in header-action-group pushed to far right */
+  .mobile-chatgpt-icon-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto !important;
+    padding: 0.35rem 0.6rem !important;
+    border-radius: 8px !important;
+    flex-shrink: 0;
+  }
+
+  /* Hide the wide Open in ChatGPT button inside ai-toolbar on mobile view */
+  .desktop-chatgpt-btn {
+    display: none !important;
+  }
+
+  /* Hide empty ai-toolbar container on mobile when Gemini key is absent */
+  .ai-toolbar-mobile-hide {
+    display: none !important;
+  }
+
+  .mobile-gpt-text {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    font-size: 0.725rem;
+  }
+
+  /* Always hide Ask ChatGPT (Local) on mobile view */
+  .btn-ai-chatgpt-local {
+    display: none !important;
+  }
+
+  /* Hide Ask Gemini on mobile view when key is not present (disabled) */
+  .hide-mobile-if-no-key,
+  .btn-ai-gemini:disabled {
+    display: none !important;
+  }
+
+  /* Option Cards */
+  .option-card {
+    padding: 0.85rem 0.95rem;
+    border-radius: 12px;
+  }
+
+  .option-content {
+    gap: 0.65rem;
+  }
+
+  .option-label {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  /* On mobile view, hide option feedback badges (Correct / Incorrect / Correct Answer) as option colors indicate correctness */
+  .option-feedback-badge,
+  .badge-status,
+  .badge-review {
+    display: none !important;
+  }
+
+  /* Results Screen Mobile */
+  .results-container {
+    padding: 0.85rem 0.5rem;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  .results-top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .results-top-bar .btn-sm {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .results-page-title {
+    order: 3;
+    width: 100%;
+    text-align: center;
+    margin-top: 0.25rem;
+  }
+
+  .results-page-title h2 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .results-header {
+    flex-direction: column;
+    padding: 1.25rem 0.75rem;
+    gap: 1.15rem;
+    border-radius: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .score-badge {
+    width: 120px;
+    height: 120px;
+  }
+
+  .percentage {
+    font-size: 2rem;
+  }
+
+  .results-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .stat-box {
+    padding: 0.65rem 0.35rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .stat-number {
+    font-size: 1.35rem;
+    line-height: 1.2;
+    margin-bottom: 0.1rem;
+  }
+
+  .stat-box .stat-label {
+    font-size: 0.7rem !important;
+    color: var(--text-secondary) !important;
+    display: block !important;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .results-filters {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.4rem;
+    gap: 0.4rem;
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .results-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-btn {
+    white-space: nowrap;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.725rem;
+    flex-shrink: 0;
+  }
+
+  .questions-list {
+    max-height: 380px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .result-item {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.85rem 0.75rem;
+    border-radius: 12px;
+  }
+
+  .result-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.4rem;
+  }
+
+  .badge-status-sm {
+    font-size: 0.675rem;
+    padding: 0.15rem 0.4rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .question-detail-card {
+    padding: 1.15rem 0.85rem;
+    border-radius: 16px;
+  }
+
+  .detail-q-badge {
+    font-size: 0.925rem;
+  }
+
+  .detail-question-prompt p {
+    font-size: 0.95rem;
+  }
+
+  .option-review-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .option-review-right {
+    width: 100%;
+  }
+
+  .badge-review {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Question Grid Modal Mobile */
+  .modal-backdrop {
+    padding: 0.5rem;
+  }
+
+  .modal-content {
+    padding: 1.15rem 0.85rem;
+    max-height: 92vh;
+    border-radius: 16px;
+    gap: 0.85rem;
+  }
+
+  .modal-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+    gap: 0.4rem;
+    max-height: 280px;
+  }
+
+  .grid-item {
+    height: 40px;
+    font-size: 0.825rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-btn-text {
+    display: none;
+  }
+
+  .exam-navbar {
+    padding: 0.45rem 0.5rem;
+  }
+
+  .navbar-controls .btn-sm {
+    padding: 0.3rem 0.45rem;
+    font-size: 0.7rem;
+  }
+
+  .timer-wrapper {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.85rem;
+  }
+
   .question-card {
-    padding: 1.35rem;
+    padding: 0.95rem 0.75rem;
+  }
+
+  .question-badge {
+    font-size: 0.9rem;
+  }
+
+  .badge-multiple {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.45rem;
   }
 }
 

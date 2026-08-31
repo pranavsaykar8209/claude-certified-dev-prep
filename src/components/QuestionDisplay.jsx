@@ -3,6 +3,21 @@ import { Sparkles, Bot, ExternalLink, Bookmark, ArrowLeft, ArrowRight, HelpCircl
 import { askGeminiForExplanation, openInChatGPT } from '../services/aiService'
 import AIExplanationPanel from './AIExplanationPanel'
 
+function ChatGPTIcon({ size = 16, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9 6.0651 6.0651 0 0 0-4.981-2.01 6.01 6.01 0 0 0-5.7483 4.19 6.0135 6.0135 0 0 0-4.0416 3.12 6.0651 6.0651 0 0 0 .7418 7.14 5.9847 5.9847 0 0 0 .5157 4.9108 6.0462 6.0462 0 0 0 6.5098 2.9 6.0651 6.0651 0 0 0 4.981 2.01 6.01 6.01 0 0 0 5.7483-4.19 6.0135 6.0135 0 0 0 4.0416-3.12 6.0651 6.0651 0 0 0-.7418-7.14zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0819 4.7792-2.7582a.7954.7954 0 0 0 .3927-.6813v-6.7369l2.0221 1.1683a.071.071 0 0 1 .038.052v5.5826a4.5045 4.5045 0 0 1-4.4975 4.4962zm-9.6607-4.1254a4.47 4.47 0 0 1-.5346-3.0137l.142.0852 4.7838 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.08.08 0 0 1-.0332.0615l-4.8316 2.7877a4.4993 4.4993 0 0 1-6.1498-1.6428zm-1.1292-10.4636a4.4755 4.4755 0 0 1 2.3418-1.9729v5.6795a.784.784 0 0 0 .3927.6813l5.8286 3.3639-2.0221 1.1683a.071.071 0 0 1-.0678.0069l-4.8316-2.7923a4.501 4.501 0 0 1-1.6416-6.1347zm15.4616 2.337l-5.8332-3.3685 2.0221-1.1683a.071.071 0 0 1 .0678-.0069l4.8316 2.7923a4.501 4.501 0 0 1 1.6416 6.1347 4.4755 4.4755 0 0 1-2.3418 1.9729v-5.6795a.784.784 0 0 0-.3881-.6767zm2.2584 4.5714l-.142-.0852-4.7792-2.7582a.7712.7712 0 0 0-.7806 0l-5.8428 3.3685v-2.3324a.08.08 0 0 1 .0332-.0615l4.8316-2.7877a4.4993 4.4993 0 0 1 6.1498 1.6428 4.47 4.47 0 0 1 .53 3.0137zM8.307 12.8066l-2.0221-1.1683a.071.071 0 0 1-.038-.052v-5.5826a4.4975 4.4975 0 0 1 7.3739-3.4554l-.1419.0819-4.7792 2.7582a.7954.7954 0 0 0-.3927.6813v6.7369zm1.1897-3.6666l2.8718-1.6577 2.8718 1.6577v3.3155l-2.8718 1.6577-2.8718-1.6577z"/>
+    </svg>
+  )
+}
+
 export default function QuestionDisplay({
   question,
   questionNumber,
@@ -176,7 +191,7 @@ export default function QuestionDisplay({
           {/* Show / Hide Top Header Button */}
           {onToggleHeader && (
             <button
-              className="btn btn-secondary btn-sm"
+              className="btn btn-secondary btn-sm btn-hide-header-desktop"
               onClick={onToggleHeader}
               title={isHeaderHidden ? "Show top header navbar" : "Hide top header navbar"}
             >
@@ -190,7 +205,7 @@ export default function QuestionDisplay({
 
           {/* Native Browser Fullscreen Toggle Button */}
           <button
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm btn-fullscreen-desktop"
             onClick={toggleFullscreen}
             title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen Mode (Hides URL bar & tabs)"}
           >
@@ -199,6 +214,16 @@ export default function QuestionDisplay({
             ) : (
               <><Maximize size={14} /> Fullscreen</>
             )}
+          </button>
+
+          {/* Mobile-only ChatGPT Icon Button with GPT text pushed to far right */}
+          <button
+            className="btn btn-ai-chatgpt btn-sm mobile-chatgpt-icon-btn"
+            onClick={handleOpenChatGPT}
+            title="Ask ChatGPT AI for question explanation"
+          >
+            <ChatGPTIcon size={14} />
+            <span className="mobile-gpt-text">GPT</span>
           </button>
         </div>
       </div>
@@ -209,60 +234,58 @@ export default function QuestionDisplay({
       </div>
 
       {/* AI Assistance Tools Bar in Prepare Mode */}
-      {isPrepareMode && (
-        <>
-          <div className="ai-toolbar">
-            <button className="btn btn-ai-chatgpt" onClick={handleOpenChatGPT}>
-              <ExternalLink size={16} />
-              Open in ChatGPT
-            </button>
+      {isPrepareMode && (() => {
+        const apiKey = import.meta.env.VITE_GOOGLE_API_KEY
+        const hasGeminiKey = !!apiKey && apiKey !== 'YOUR_GOOGLE_API_KEY_HERE'
 
-            {(() => {
-              const apiKey = import.meta.env.VITE_GOOGLE_API_KEY
-              const hasGeminiKey = !!apiKey && apiKey !== 'YOUR_GOOGLE_API_KEY_HERE'
+        return (
+          <>
+            <div className={`ai-toolbar ${!hasGeminiKey ? 'ai-toolbar-mobile-hide' : ''}`}>
+              <button className="btn btn-ai-chatgpt desktop-chatgpt-btn" onClick={handleOpenChatGPT}>
+                <ChatGPTIcon size={16} />
+                Open in ChatGPT
+              </button>
 
-              return (
-                <button
-                  className="btn btn-ai-gemini"
-                  onClick={handleAskAI}
-                  disabled={aiLoading || !hasGeminiKey}
-                  title={
-                    !hasGeminiKey
-                      ? "Google Gemini API Key is missing. Add VITE_GOOGLE_API_KEY to your .env file to enable Gemini AI tutoring."
-                      : aiLoading
-                      ? "Asking Gemini..."
-                      : "Ask Gemini AI for question explanation"
-                  }
-                >
-                  <Sparkles size={16} className={hasGeminiKey ? "sparkle-anim" : ""} />
-                  {aiLoading ? 'Asking Gemini...' : hasGeminiKey ? 'Ask Gemini' : 'Ask Gemini (Disabled)'}
-                </button>
-              )
-            })()}
+              <button
+                className={`btn btn-ai-gemini ${!hasGeminiKey ? 'hide-mobile-if-no-key' : ''}`}
+                onClick={handleAskAI}
+                disabled={aiLoading || !hasGeminiKey}
+                title={
+                  !hasGeminiKey
+                    ? "Google Gemini API Key is missing. Add VITE_GOOGLE_API_KEY to your .env file to enable Gemini AI tutoring."
+                    : aiLoading
+                    ? "Asking Gemini..."
+                    : "Ask Gemini AI for question explanation"
+                }
+              >
+                <Sparkles size={16} className={hasGeminiKey ? "sparkle-anim" : ""} />
+                {aiLoading ? 'Asking Gemini...' : hasGeminiKey ? 'Ask Gemini' : 'Ask Gemini (Disabled)'}
+              </button>
 
-            <button
-              className="btn btn-ai-chatgpt-local"
-              disabled={true}
-              title="Local ChatGPT integration is currently disabled"
-            >
-              <Bot size={16} />
-              Ask ChatGPT (Local)
-            </button>
-          </div>
+              <button
+                className="btn btn-ai-chatgpt-local"
+                disabled={true}
+                title="Local ChatGPT integration is currently disabled"
+              >
+                <Bot size={16} />
+                Ask ChatGPT (Local)
+              </button>
+            </div>
 
-          {/* AI Explanation Panel */}
-          <AIExplanationPanel
-            aiProvider={aiProvider}
-            aiData={aiData}
-            loading={aiLoading}
-            error={aiError}
-            userAnswer={userAnswer}
-            actualCorrectAnswers={question.correctAnswers}
-            options={question.options}
-            showAnswerComparison={isAnswered}
-          />
-        </>
-      )}
+            {/* AI Explanation Panel */}
+            <AIExplanationPanel
+              aiProvider={aiProvider}
+              aiData={aiData}
+              loading={aiLoading}
+              error={aiError}
+              userAnswer={userAnswer}
+              actualCorrectAnswers={question.correctAnswers}
+              options={question.options}
+              showAnswerComparison={isAnswered}
+            />
+          </>
+        )
+      })()}
 
       {/* Options List */}
       <div className="options-container">

@@ -106,19 +106,19 @@ export default function ResultsScreen() {
         <div className="results-stats">
           <div className="stat-box correct">
             <div className="stat-number">{correct}</div>
-            <div className="stat-label">Correct Answers</div>
+            <div className="stat-label">Correct</div>
           </div>
           <div className="stat-box incorrect">
             <div className="stat-number">{incorrect}</div>
-            <div className="stat-label">Incorrect Answers</div>
+            <div className="stat-label">Incorrect</div>
           </div>
           <div className="stat-box not-attempted">
             <div className="stat-number">{notAttempted}</div>
-            <div className="stat-label">Not Attempted</div>
+            <div className="stat-label">Unattempted</div>
           </div>
           <div className="stat-box total">
             <div className="stat-number">{results.total}</div>
-            <div className="stat-label">Total Questions</div>
+            <div className="stat-label">Total</div>
           </div>
         </div>
       </div>
