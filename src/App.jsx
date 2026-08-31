@@ -7,8 +7,8 @@ import ResultsScreen from './components/ResultsScreen'
 function SelectionPage() {
   const navigate = useNavigate()
 
-  const handleSelectExam = (examNumber) => {
-    navigate(`/exam/${examNumber}`)
+  const handleSelectExam = (examNumber, mode = 'prepare') => {
+    navigate(`/exam/${examNumber}?mode=${mode}`)
   }
 
   return <ExamSelection onSelectExam={handleSelectExam} />

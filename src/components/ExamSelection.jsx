@@ -1,55 +1,92 @@
 import React, { useState, useEffect } from 'react'
+import { BookOpen, Sparkles, Clock, ArrowRight, BrainCircuit, PlayCircle } from 'lucide-react'
 import { getAllExams } from '../exams'
 
 export default function ExamSelection({ onSelectExam }) {
   const [exams, setExams] = useState([])
 
   useEffect(() => {
-    // Load exams directly from imports
     const allExams = getAllExams()
-    const examList = allExams.map(exam => ({
+    const examList = allExams.map((exam) => ({
       number: exam.number,
       title: `Exam ${exam.number}`,
-      description: `${exam.count} Questions • Multiple Choice`,
+      description: `${exam.count} Questions • Single & Multiple Choice`,
     }))
     setExams(examList)
   }, [])
 
   if (exams.length === 0) {
     return (
-      <div className="exam-selection">
-        <div className="exam-selection-card">
-          <p style={{ textAlign: 'center', marginTop: '3rem', color: '#999' }}>No exams found</p>
+      <div className="selection-wrapper">
+        <div className="selection-container">
+          <p className="no-data-text">No exams found.</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="exam-selection">
-      <div className="exam-selection-card">
-        <h1>📚 Exam Platform</h1>
-        <p style={{ textAlign: 'center', color: '#666', marginBottom: '2rem', fontSize: '1.1rem' }}>
-          Select an exam to begin. You have 120 minutes to complete each exam.
-        </p>
-        <div className="exam-grid">
-          {exams.map(exam => (
-            <div
-              key={exam.number}
-              className="exam-card"
-              onClick={() => onSelectExam(exam.number)}
-            >
+    <div className="selection-wrapper">
+      <div className="selection-container">
+        {/* Hero Section */}
+        <div className="selection-hero">
+          <div className="hero-badge">
+            <Sparkles size={16} /> AI-Powered Study & Practice Platform
+          </div>
+          <h1 className="hero-title">Exam & Practice Simulator</h1>
+          <p className="hero-description">
+            Choose between taking a timed <strong>Official Exam</strong> or studying with <strong>AI Preparation Mode</strong> (Google Gemini explanations, ChatGPT quick-prompts & answer checks).
+          </p>
+
+          <div className="hero-feature-tags">
+            <span className="feature-tag">
+              <Clock size={14} className="text-amber" /> 120-Min Official Exam Mode
+            </span>
+            <span className="feature-tag">
+              <Sparkles size={14} className="text-cyan" /> Gemini AI & ChatGPT Preparation
+            </span>
+            <span className="feature-tag">
+              <BookOpen size={14} className="text-emerald" /> Untimed Learning Mode
+            </span>
+          </div>
+        </div>
+
+        {/* Exams Grid */}
+        <div className="selection-grid">
+          {exams.map((exam) => (
+            <div key={exam.number} className="selection-card">
+              <div className="card-header">
+                <div className="card-icon-box">
+                  <BookOpen size={24} />
+                </div>
+                <span className="card-badge">53 Questions</span>
+              </div>
+
               <h3>{exam.title}</h3>
-              <p>{exam.description}</p>
-              <p style={{ marginTop: '0.5rem', fontSize: '0.85rem', opacity: 0.8 }}>
-                ⏱️ 120 min • Passing: 72%
-              </p>
+              <p className="card-desc">{exam.description}</p>
+
+              <div className="card-meta">
+                <span>Passing threshold: 72%</span>
+              </div>
+
+              {/* Two Distinct Modes */}
+              <div className="card-action-group">
+                <button
+                  className="btn btn-secondary btn-full"
+                  onClick={() => onSelectExam(exam.number, 'exam')}
+                >
+                  <PlayCircle size={16} /> Start Exam (Timed)
+                </button>
+                <button
+                  className="btn btn-primary btn-full"
+                  onClick={() => onSelectExam(exam.number, 'prepare')}
+                >
+                  <Sparkles size={16} /> Prepare Exam (AI)
+                </button>
+              </div>
             </div>
           ))}
         </div>
-        <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.85rem', color: '#999' }}>
-          💡 Tip: Add new exam JSON files to <code>src/exams/</code> and update <code>src/exams/index.js</code>
-        </p>
       </div>
     </div>
   )

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import ExamContent from './ExamContent'
 import { getExam } from '../exams'
 import useSessionStorage from '../hooks/useSessionStorage'
 
 export default function ExamInterface() {
   const { examNumber } = useParams()
+  const [searchParams] = useSearchParams()
+  const modeParam = searchParams.get('mode') || 'prepare' // 'exam' or 'prepare'
+
   const navigate = useNavigate()
   const [sessionData, setSessionData] = useSessionStorage(`examSession-${examNumber}`, null)
   const [questions, setQuestions] = useState([])
@@ -13,7 +16,6 @@ export default function ExamInterface() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // Load exam data from direct imports
     loadExamData()
   }, [examNumber])
 
@@ -29,14 +31,15 @@ export default function ExamInterface() {
 
       setQuestions(data)
 
-      // Initialize session if not exists
-      if (!sessionData) {
+      // Initialize session if not exists or if mode changed
+      if (!sessionData || sessionData.mode !== modeParam) {
         setSessionData({
           startTime: Date.now(),
           answers: {},
           visited: {},
           flagged: {},
           currentQuestion: 0,
+          mode: modeParam, // 'exam' or 'prepare'
         })
       }
     } catch (err) {
@@ -55,21 +58,10 @@ export default function ExamInterface() {
     )
   }
 
-  if (error) {
+  if (error || questions.length === 0) {
     return (
       <div className="exam-loading">
-        <div className="error">{error}</div>
-        <button onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>
-          Go Back
-        </button>
-      </div>
-    )
-  }
-
-  if (questions.length === 0) {
-    return (
-      <div className="exam-loading">
-        <div className="error">No questions found in this exam</div>
+        <div className="error">{error || 'No questions found in this exam'}</div>
         <button onClick={() => navigate('/')} style={{ marginTop: '1rem' }}>
           Go Back
         </button>
@@ -80,6 +72,7 @@ export default function ExamInterface() {
   return (
     <ExamContent
       examNumber={parseInt(examNumber)}
+      mode={sessionData?.mode || modeParam}
       questions={questions}
       sessionData={sessionData}
       setSessionData={setSessionData}
