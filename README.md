@@ -4,6 +4,8 @@ An interactive, AI-powered study and exam simulation platform designed to prepar
 
 Features **5 complete practice exams** (265 scenario-based questions), live **Google Gemini AI tutoring**, **120-minute timed exam mode**, and **comprehensive performance review**.
 
+👉 **Live Demo**: [https://claude-certified-dev-prep.vercel.app](https://claude-certified-dev-prep.vercel.app)
+
 ---
 
 ## ✨ Features
