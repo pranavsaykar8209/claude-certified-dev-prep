@@ -212,14 +212,33 @@ export default function QuestionDisplay({
       {isPrepareMode && (
         <>
           <div className="ai-toolbar">
-            <button
-              className="btn btn-ai-gemini"
-              onClick={handleAskAI}
-              disabled={aiLoading}
-            >
-              <Sparkles size={16} className="sparkle-anim" />
-              {aiLoading ? 'Asking Gemini...' : 'Ask Gemini'}
+            <button className="btn btn-ai-chatgpt" onClick={handleOpenChatGPT}>
+              <ExternalLink size={16} />
+              Open in ChatGPT
             </button>
+
+            {(() => {
+              const apiKey = import.meta.env.VITE_GOOGLE_API_KEY
+              const hasGeminiKey = !!apiKey && apiKey !== 'YOUR_GOOGLE_API_KEY_HERE'
+
+              return (
+                <button
+                  className="btn btn-ai-gemini"
+                  onClick={handleAskAI}
+                  disabled={aiLoading || !hasGeminiKey}
+                  title={
+                    !hasGeminiKey
+                      ? "Google Gemini API Key is missing. Add VITE_GOOGLE_API_KEY to your .env file to enable Gemini AI tutoring."
+                      : aiLoading
+                      ? "Asking Gemini..."
+                      : "Ask Gemini AI for question explanation"
+                  }
+                >
+                  <Sparkles size={16} className={hasGeminiKey ? "sparkle-anim" : ""} />
+                  {aiLoading ? 'Asking Gemini...' : hasGeminiKey ? 'Ask Gemini' : 'Ask Gemini (Disabled)'}
+                </button>
+              )
+            })()}
 
             <button
               className="btn btn-ai-chatgpt-local"
@@ -228,11 +247,6 @@ export default function QuestionDisplay({
             >
               <Bot size={16} />
               Ask ChatGPT (Local)
-            </button>
-
-            <button className="btn btn-ai-chatgpt" onClick={handleOpenChatGPT}>
-              <ExternalLink size={16} />
-              Open in ChatGPT
             </button>
           </div>
 

@@ -219,6 +219,15 @@
   color: var(--text-primary);
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: auto !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
 .btn-ai-gemini {
   background: linear-gradient(135deg, rgba(56, 189, 248, 0.2) 0%, rgba(99, 102, 241, 0.25) 100%);
   color: var(--accent-cyan);
@@ -231,6 +240,14 @@
   border-color: var(--accent-cyan);
   box-shadow: 0 0 24px rgba(56, 189, 248, 0.35);
   transform: translateY(-1px);
+}
+
+.btn-ai-gemini:disabled {
+  background: rgba(15, 23, 42, 0.6) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
 }
 
 

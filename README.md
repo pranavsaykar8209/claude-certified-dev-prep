@@ -47,11 +47,12 @@ Features **5 complete practice exams** (265 scenario-based questions), live **Go
    npm install
    ```
 
-3. **Configure Environment Variables** (Optional - for Gemini AI tutoring):
-   Create a `.env` file in the root directory:
-   ```env
-   VITE_GOOGLE_API_KEY=YOUR_GEMINI_API_KEY_HERE
-   ```
+3. **Configure Environment Variables** *(Optional)*:
+   - **Zero Configuration Required**: All practice exams, timer, score analysis, and the **"Open in ChatGPT"** feature work completely out of the box without any API key.
+   - *(Optional)* To enable in-app **Google Gemini AI explanations**, create a `.env` file in the root directory:
+     ```env
+     VITE_GOOGLE_API_KEY=YOUR_GEMINI_API_KEY_HERE
+     ```
 
 4. **Start the Development Server**:
    ```bash

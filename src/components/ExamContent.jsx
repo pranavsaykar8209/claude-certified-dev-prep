@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react'
-import { BookOpen, Clock, Grid, PauseCircle, PlayCircle, Award, CheckCircle2, Bookmark, Circle, Sparkles, Eye, EyeOff } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { BookOpen, Clock, Grid, PauseCircle, PlayCircle, Award, CheckCircle2, Bookmark, Circle, Sparkles, Eye, EyeOff, Home } from 'lucide-react'
 import Timer from './Timer'
 import QuestionDisplay from './QuestionDisplay'
 import QuestionGridModal from './QuestionGridModal'
@@ -13,6 +14,7 @@ export default function ExamContent({
   setSessionData,
   onComplete,
 }) {
+  const navigate = useNavigate()
   const [currentIdx, setCurrentIdx] = useState(sessionData?.currentQuestion || 0)
   const [isPaused, setIsPaused] = useState(false)
   const [isGridModalOpen, setIsGridModalOpen] = useState(false)
@@ -145,10 +147,13 @@ export default function ExamContent({
       {!isHeaderHidden && (
         <header className="exam-navbar">
           <div className="navbar-brand">
-            <span className="brand-badge">Exam {examNumber}</span>
-            <h1 className="brand-title">
-              {isPrepareMode ? 'Preparation Mode' : 'Exam Simulator'}
-            </h1>
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={() => navigate('/')}
+              title="Go to Home / Exam Selection"
+            >
+              <Home size={15} /> Home
+            </button>
           </div>
 
           {/* Center Quick Stats */}
