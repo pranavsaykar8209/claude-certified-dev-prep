@@ -1,194 +1,153 @@
-# 📚 Exam Platform - Udemy Style
+# 🎓 Claude Certified Developer Exam Prep Platform
 
-A professional exam platform built with React featuring a modern Udemy-inspired UI with question navigation, flagging system, comprehensive results analysis, and session persistence.
+An interactive, AI-powered study and exam simulation platform designed to prepare developers for the **Claude Certified Developer** certification and Anthropic AI development topics.
+
+Features **5 complete practice exams** (265 scenario-based questions), live **Google Gemini AI tutoring**, **120-minute timed exam mode**, and **comprehensive performance review**.
+
+---
 
 ## ✨ Features
 
-- **5 Complete Exams**: 265 total questions (53 each)
-- **Question Navigation**: Click any question to jump instantly
-- **Flagging System**: Mark questions for review
-- **Real-time Statistics**: See answered, flagged, and not visited counts
-- **120-Minute Timer**: With color-coded warnings
-- **Session Persistence**: Resume where you left off
-- **Comprehensive Results**: 
-  - Score with pass/fail status
-  - Breakdown of correct/incorrect/not attempted
-  - Filter by question status
-  - Detailed review with explanations
-- **Pause Feature**: Hide exam content when paused
-- **Responsive Design**: Works on all devices
+- **📚 5 Complete Practice Exams**: 265 total questions (53 scenario-based questions per exam).
+- **⚡ Dual Study Modes**:
+  - **Preparation Mode (AI Tutoring)**: Untimed practice with instant feedback, official solution explanations, and Google Gemini AI insights.
+  - **Official Timed Exam Mode**: Realistic 120-minute exam simulation with countdown timer and score report.
+- **🤖 Google Gemini AI Integration**:
+  - Generates detailed independent question breakdowns.
+  - Predicts answers with rationale.
+  - Provides option-by-option correct/incorrect analysis.
+- **📊 Detailed Results & Answer Review**:
+  - Score percentage and Pass/Fail status (72% passing threshold).
+  - Filter review by **All**, **Correct**, **Incorrect**, or **Flagged** questions.
+  - Clear visual indicator of your choice vs. official answer.
+- **🚩 Flagging & Navigation**:
+  - Flag questions for later review.
+  - Pop-up Question Grid modal to jump directly to any question.
+- **💾 Session Persistence**: Automatically saves user answers, flagged state, and timer progress across refreshes.
+- **📱 Fully Responsive UI**: Modern dark glassmorphism design optimized for desktop, tablet, and mobile views.
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js v16+
-- npm
+- **Node.js**: v16+
+- **npm**: v8+
 
-### Installation & Run
+### Installation
 
-```bash
-npm install
-npm run dev
-```
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/pranavsaykar8209/claude-certified-dev-prep.git
+   cd claude-certified-dev-prep
+   ```
 
-Open http://localhost:5173/ in your browser
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure Environment Variables** (Optional - for Gemini AI tutoring):
+   Create a `.env` file in the root directory:
+   ```env
+   VITE_GOOGLE_API_KEY=YOUR_GEMINI_API_KEY_HERE
+   ```
+
+4. **Start the Development Server**:
+   ```bash
+   npm run dev
+   ```
+   Open `http://localhost:5173/` in your browser.
+
+---
 
 ## 📁 Project Structure
 
 ```
-ClaudeCode/
+claude-certified-dev-prep/
 ├── src/
 │   ├── components/
-│   │   ├── ExamSelection.jsx       # Exam selection screen
-│   │   ├── ExamInterface.jsx       # Main exam layout
-│   │   ├── ExamContent.jsx         # Exam logic
-│   │   ├── QuestionNavigation.jsx  # Question grid
-│   │   ├── QuestionDisplay.jsx     # Question rendering
-│   │   ├── ResultsScreen.jsx       # Results & analysis
-│   │   ├── Timer.jsx               # 120-min countdown
-│   │   └── PauseOverlay.jsx        # Pause modal
-│   ├── styles/
-│   │   └── exam.css                # All styling
-│   ├── hooks/
-│   │   └── useSessionStorage.js    # Session persistence
+│   │   ├── ExamSelection.jsx       # Home screen with exam card selection
+│   │   ├── ExamContent.jsx         # Main exam interface & header controls
+│   │   ├── QuestionDisplay.jsx     # Question layout & option selector
+│   │   ├── AIExplanationPanel.jsx  # Google Gemini AI tutoring panel
+│   │   ├── QuestionGridModal.jsx   # Quick jump question grid modal
+│   │   ├── ResultsScreen.jsx       # Detailed performance review screen
+│   │   ├── Timer.jsx               # 120-minute countdown timer
+│   │   └── PauseOverlay.jsx        # Exam pause modal overlay
+│   ├── services/
+│   │   └── aiService.js            # Google Gemini AI API integration
 │   ├── exams/
-│   │   ├── exam-1.json             # Exam questions
-│   │   ├── exam-2.json
-│   │   ├── exam-3.json
-│   │   ├── exam-4.json
-│   │   └── exam-5.json
-│   ├── App.jsx                     # Main router
-│   └── index.css                   # Global styles
-├── public/
-│   └── exams/                      # Exam data accessible to app
-├── dist/                           # Production build
-├── index.html                      # HTML entry point
-├── main.jsx                        # React entry point
-├── vite.config.js                  # Vite configuration
-└── package.json                    # Dependencies
-
+│   │   ├── exam-1.json             # Practice Exam 1 (53 questions)
+│   │   ├── exam-2.json             # Practice Exam 2 (53 questions)
+│   │   ├── exam-3.json             # Practice Exam 3 (53 questions)
+│   │   ├── exam-4.json             # Practice Exam 4 (53 questions)
+│   │   ├── exam-5.json             # Practice Exam 5 (53 questions)
+│   │   └── index.js                # Exam data loader
+│   ├── styles/
+│   │   └── exam.css                # Component & layout styling
+│   ├── App.jsx                     # Router configuration
+│   ├── main.jsx                    # Application entry point
+│   └── index.css                   # Global design tokens & base styles
+├── public/                         # Public assets & static exams
+├── vite.config.js                  # Vite build configuration
+└── package.json                    # Project dependencies & scripts
 ```
 
-## 🎯 Using the Platform
+---
+
+## 🎯 How to Use the Platform
 
 ### 1. Select an Exam
-- Choose from 5 available exams
-- Each exam has 53 questions
+From the homepage, select any of the 5 practice exams:
+- Click **"Start Exam (Timed)"** to test yourself under simulated 120-minute exam conditions.
+- Click **"Prepare Exam (AI)"** to practice untimed with Gemini AI explanations and immediate feedback.
 
-### 2. Take the Exam
-- **Left Sidebar**: Navigate questions with color-coded status
-  - Blue = Current question
-  - Green = Answered
-  - Orange = Flagged
-  - Gray = Not visited
-- **Main Area**: Display question and options
-- **Header**: Timer and statistics
-- **Navigation**: Previous/Next or jump to any question
+### 2. Answering Questions
+- **Single Choice**: Select one radio option.
+- **Multiple Choice**: Select the exact number of required checkbox options (e.g. *Select 2 Answers*).
+- Click **"Flag"** to mark questions you want to review later.
+- Click **"Questions"** button in the header to jump to any specific question via the grid overlay.
 
-### 3. During Exam
-- Select answer (radio for single, checkbox for multiple)
-- Click flag button to mark for review
-- See real-time stats update
-- Use Previous/Next buttons
-- Click any question number to jump
+### 3. Using AI Assistance (Preparation Mode)
+- Click **"Ask Gemini"** to fetch AI tutoring, predicted answers, and option analysis for the current question.
+- Click **"Open in ChatGPT"** to copy the question prompt to your clipboard and open ChatGPT.
 
-### 4. Finish Exam
-- Click "Finish Exam" on last question
-- Automatic calculation of results
+### 4. Reviewing Performance
+Upon finishing an exam, the **Results Screen** presents:
+- Final Score percentage and Pass/Fail badge.
+- Question count summary (Correct, Incorrect, Not Attempted).
+- Left-side filterable list of all questions.
+- Right-side detailed question breakdown displaying your selection, the official correct answer, and explanation.
 
-### 5. Review Results
-- See score percentage and status
-- View statistics (Correct/Incorrect/Not Attempted)
-- Filter questions by status
-- Click any question to see details and explanation
-- Retake exam or go back to selection
+---
 
-## 💾 Session Storage
+## 🛠️ Built With
 
-Each exam maintains isolated session data:
-- User's answers
-- Visited questions
-- Flagged questions
-- Results (after completion)
+- **[React 18](https://react.dev/)**: UI Library
+- **[Vite](https://vitejs.dev/)**: Next-Generation Frontend Tooling
+- **[React Router DOM v7](https://reactrouter.com/)**: Application Routing
+- **[Google Generative AI SDK](https://www.npmjs.com/package/@google/generative-ai)**: Gemini AI API Integration
+- **[Lucide React](https://lucide.dev/)**: Icon Set
 
-Session data is automatically saved and restored on page refresh.
+---
 
-## 🎨 Design Features
+## 📦 Production Build
 
-- **Modern Color Scheme**: Blue, green, red, orange accents
-- **Clean Typography**: Easy to read fonts and hierarchy
-- **Responsive Layout**: Grid-based, works on mobile
-- **Smooth Interactions**: Hover effects and transitions
-- **Professional UI**: Matches Udemy course style
-
-## 🔧 Technologies
-
-- **React 18**: UI framework
-- **React Router DOM**: URL routing
-- **Vite**: Fast build tool
-- **CSS3**: Modern styling
-
-## 📊 Exam Statistics
-
-- **Total Questions**: 265 (53 per exam × 5 exams)
-- **Question Types**: Multiple choice (single & multiple answers)
-- **Passing Score**: 72%
-- **Time Limit**: 120 minutes per exam
-
-## 🌐 Browser Support
-
-- Chrome/Chromium ✓
-- Firefox ✓
-- Safari ✓
-- Edge ✓
-- Mobile browsers ✓
-
-## 📦 Build for Production
+To build the app for production deployment:
 
 ```bash
 npm run build
 ```
 
-Creates optimized build in `dist/` folder
+The optimized static bundle will be created in the `dist/` directory. You can preview the build locally with:
 
-## 🐛 Troubleshooting
-
-**Exam won't load?**
-- Check browser console (F12)
-- Ensure exam files exist in `public/exams/`
-- Try refreshing the page
-
-**Session not saving?**
-- Check if sessionStorage is enabled
-- Try a different browser
-- Clear browser cache
-
-**Questions not appearing?**
-- Verify exam data files are in `public/exams/`
-- Check network tab in browser DevTools
-- Restart dev server
-
-## 📝 Development
-
-### Add New Exam
-1. Create `src/exams/exam-6.json` with questions
-2. Copy to `public/exams/exam-6.json`
-3. Update `ExamSelection.jsx` to include new exam
-
-### Modify Styling
-- Edit `src/styles/exam.css`
-- Changes apply immediately with hot reload
-
-### Change Passing Score
-- Edit `ExamContent.jsx` line with `percentage >= 72`
-- Change 72 to desired threshold
-
-## 📄 License
-
-This project is for educational purposes.
+```bash
+npm run preview
+```
 
 ---
 
-**Your professional exam platform is ready!** 🎓
+## 📄 License
 
-Start at: http://localhost:5173/
+This project is open-source and intended for educational and study purposes.
